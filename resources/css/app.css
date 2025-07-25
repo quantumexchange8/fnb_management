@@ -1,3 +1,99 @@
-@tailwind base;
+@layer tailwind-base, antd;
+
+@layer tailwind-base {
+  @tailwind base;
+}
 @tailwind components;
 @tailwind utilities;
+
+[type='text']:focus,
+input:where(:not([type])):focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus,
+.ant-select-focused .ant-select-selector {
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  /* border-color: #D1D5DB !important; 保持原有边框颜色 */
+}
+
+/* Color Picker */
+
+.custom-color-picker .ant-color-picker-color-block {
+    border-radius: 100%;
+}
+
+.ql-toolbar.ql-snow {
+    border: 0px solid transparent !important;
+    border-bottom: 1px solid #E4E4E7 !important;
+}
+
+/* Table */
+
+.ant-table-wrapper .ant-table-thead >tr>th, .ant-table-wrapper .ant-table-thead >tr>td {
+  padding: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 16px;
+  color: #09090B;
+}
+
+/* Pagination */
+
+.ant-table-wrapper .ant-table-pagination-center {
+  align-items: center;
+}
+
+.ant-pagination .ant-pagination-item-active a {
+  color: white;
+}
+
+.ant-pagination .ant-pagination-item {
+  border-radius: 100%;
+  background: #18181B;
+}
+
+.ant-pagination .ant-pagination-item-active {
+    border-color: transparent;
+}
+
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+    border-radius: 12px;
+    box-shadow: 0px 1px 2px 0px rgba(9, 9, 11, 0.05);
+    border-color: #E4E4E7;
+}
+
+.ant-select-dropdown {
+    border-radius: 8px;
+}
+
+.ant-select-dropdown .ant-select-item-option {
+    border-radius: 8px;
+}
+
+/* ant Input number */
+.ant-input-number-affix-wrapper {
+    height: 46px;
+    border-radius: 12px;
+    border-color: #E4E4E7;
+    box-shadow: 0px 1px 2px 0px rgba(9, 9, 11, 0.05);
+}
+
+.ant-input-number-affix-wrapper .ant-input-number-handler-wrap {
+  border-radius: 0px 12px 12px 0px;
+}
+
