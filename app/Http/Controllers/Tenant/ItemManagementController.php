@@ -149,11 +149,11 @@ class ItemManagementController extends Controller
             'category_id' => 'required',
             'visibility' => 'required|string|max:255',
             'sale_price' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg|dimensions:max_width=500,max_height=500',
+            'product_image' => 'required|image|mimes:jpeg,png,jpg|dimensions:max_width=500,max_height=500',
             'description' => 'required',
         ], [
-            'image.dimensions' => 'The image must not be larger than 500x500 pixels.',
-            'image.mimes' => 'The image must be a file of type: JPG or PNG.',
+            'product_image.dimensions' => 'The image must not be larger than 500x500 pixels.',
+            'product_image.mimes' => 'The image must be a file of type: JPG or PNG.',
         ]);
 
         $findCategory = Category::find($request->category_id);
