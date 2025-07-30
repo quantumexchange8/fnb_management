@@ -1,6 +1,6 @@
 import Button from "@/Components/Button";
 import ConfirmDialog from "@/Components/ConfirmDialog";
-import { DeleteIcon, EditIcon, ExportIcon, PlusIcon, SearchIcon } from "@/Components/Icon/Outline";
+import { DeleteIcon, EditIcon, ExportIcon, GripVerticalIcon, PlusIcon, SearchIcon } from "@/Components/Icon/Outline";
 import InputLabel from "@/Components/InputLabel";
 import Modal from "@/Components/Modal";
 import TextInput from "@/Components/TextInput";
@@ -12,6 +12,7 @@ import { Editor } from "primereact/editor";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { ReactSortable } from "react-sortablejs";
 
 export default function CategoryList() {
 
@@ -31,6 +32,7 @@ export default function CategoryList() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
+    const [isOrderCategoryOpen, setIsOrderCategoryOpen] = useState(false);
 
     const fetchCategories = async () => {
         setIsLoading(true);
@@ -256,6 +258,9 @@ export default function CategoryList() {
         visibility: 'display',
         category_color: '',
         description: '',
+        category_sorting: [
+            
+        ],
     });
 
     useEffect(() => {
@@ -267,6 +272,16 @@ export default function CategoryList() {
             setData('description', selectedDetails.description);
         }
     }, [selectedDetails]);
+
+    useEffect(() => {
+        const sorted = getCategory.map((cat, index) => ({
+            id: cat.id,
+            order_no: index + 1,
+        }));
+
+        setData("category_sorting", sorted);
+
+    }, [getCategory]);
 
     const handleColorChange = (color) => {
         setData('category_color', color.toHexString());
@@ -299,6 +314,13 @@ export default function CategoryList() {
 
     const header = renderHeader();
 
+    const openMangeCategoryOrder = () => {
+        setIsOrderCategoryOpen(true)
+    }
+    const clolseMangeCategoryOrder = () => {
+        setIsOrderCategoryOpen(false)
+    }
+
     const submit = (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -309,6 +331,26 @@ export default function CategoryList() {
                 closeEditCategory();
                 fetchCategories(page, pageSize);
                 setSelectedDetails(null);
+                
+                toast.success(`${t('category_updated_success')}`, {
+                    title: `${t('category_updated_success')}`,
+                    duration: 3000,
+                    variant: 'variant3',
+                });
+                reset();
+            }
+        })
+    }
+    
+    const updateOrders = (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        post(route('items-management.update-category-orders'), {
+            onSuccess: () => {
+                setIsLoading(false);
+                clolseMangeCategoryOrder();
+                fetchCategories(page, pageSize);
                 
                 toast.success(`${t('category_updated_success')}`, {
                     title: `${t('category_updated_success')}`,
@@ -394,10 +436,15 @@ export default function CategoryList() {
                                 </Tag>
                             </div>
                         </div>
-                        <Button size="md" className="flex items-center gap-2">
-                            <ExportIcon className="text-white" />
-                            <span>{t('export')}</span>
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            <Button variant="white" size="md" onClick={openMangeCategoryOrder}>
+                                {t('reorder_categories')}
+                            </Button>
+                            <Button size="md" className="flex items-center gap-2">
+                                <ExportIcon className="text-white" />
+                                <span>{t('export')}</span>
+                            </Button>
+                        </div>
                     </div>
                     <div>
                         <Table 
@@ -409,10 +456,10 @@ export default function CategoryList() {
                                 current: page,
                                 pageSize: pageSize,
                                 position: ['bottomCenter'],
-                                showSizeChanger: true,
+                                showSizeChanger: false,
                                 pageSizeOptions: ['10', '25', '50', '100'],
                                 defaultPageSize: 10, 
-                                showQuickJumper: true,
+                                showQuickJumper: false,
                                 total: filterData?.length,
                                 showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                             }}
@@ -429,7 +476,7 @@ export default function CategoryList() {
                 maxWidth='md'
                 maxHeight='md'
                 footer={
-                    <div className="flex items-center justify-end gap-4 w-full">
+                    <div className="flex items-center justify-end gap-4 w-full p-4">
                         <Button variant="white" size="md" onClick={closeEditCategory}>Cancel</Button>
                         <Button size="md" onClick={submit} >Save Changes</Button>
                     </div>
@@ -480,6 +527,45 @@ export default function CategoryList() {
                                     headerTemplate={header}
                                 />
                             </div>
+                        </div>
+                    )
+                }
+            </Modal>
+
+            <Modal 
+                show={isOrderCategoryOpen}
+                onClose={clolseMangeCategoryOrder} 
+                title={t('reorder_categories')}
+                maxWidth='sm'
+                maxHeight='sm'
+                footer={
+                    <div className="flex items-center justify-end gap-4 w-full p-4">
+                        <Button variant="white" size="md" onClick={clolseMangeCategoryOrder}>Cancel</Button>
+                        <Button size="md" onClick={updateOrders} >Save Changes</Button>
+                    </div>
+                }
+            >
+                {
+                    (getCategory && getCategory.length > 0) && (
+                        <div >
+                            <ReactSortable
+                                list={getCategory}
+                                setList={(newState) => setGetCategory(newState)}
+                                animation={200}
+                                handle=".drag-handle"
+                                className="px-4 py-3 flex flex-col gap-3"
+                            >
+                                {
+                                    getCategory.map((category,index) => (
+                                        <div key={category.id} className="flex items-center gap-3">
+                                            <div className="drag-handle p-3 cursor-move"><GripVerticalIcon /></div>
+                                            <div className="text-neutral-900 font-semibold">
+                                                {category.name}
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </ReactSortable>
                         </div>
                     )
                 }

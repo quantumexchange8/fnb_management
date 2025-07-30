@@ -15,6 +15,9 @@ export default {
             fontFamily: {
                 sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
             },
+            backgroundImage: {
+                'gradient-hidden': 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 27.16%, rgba(242, 101, 34, 0.95) 418.27%)',
+            },
             colors: {
                 primary: {
                     50: '#FFF3E1',

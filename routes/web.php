@@ -56,15 +56,27 @@ Route::middleware('auth:tenant')->group(function () {
         Route::get('/create-product', [ItemManagementController::class, 'createProduct'])->name('items-management.create-product');
         Route::get('/modifier-group-list', [ItemManagementController::class, 'modifierGroupList'])->name('items-management.modifier-group-list');
         Route::get('/create-modifier-group', [ItemManagementController::class, 'createModifierGroup'])->name('items-management.create-modifier-group');
+        Route::get('/create-set-meal', [ItemManagementController::class, 'createSetMeal'])->name('items-management.create-set-meal');
+        Route::get('/manage-modifier-item', [ItemManagementController::class, 'manageModifierItem'])->name('items-management.manage-modifier-item');
+
         Route::get('/getCategories', [ItemManagementController::class, 'getCategories'])->name('items-management.getCategories');
         Route::get('/getModifier', [ItemManagementController::class, 'getModifier'])->name('items-management.getModifier');
         Route::get('/getProducts', [ItemManagementController::class, 'getProducts'])->name('items-management.getProducts');
+        Route::get('/getModifierItem', [ItemManagementController::class, 'getModifierItem'])->name('items-management.getModifierItem');
         
         Route::post('/store-category', [ItemManagementController::class, 'storeCategory'])->name('items-management.store-category');
         Route::post('/updateCategoryVisibility', [ItemManagementController::class, 'updateCategoryVisibility'])->name('items-management.updateCategoryVisibility');
         Route::post('/update-category', [ItemManagementController::class, 'updateCategory'])->name('items-management.update-category');
+        Route::post('/update-category-orders', [ItemManagementController::class, 'updateCategoryOrders'])->name('items-management.update-category-orders');
         Route::post('/delete-category', [ItemManagementController::class, 'deleteCategory'])->name('items-management.delete-category');
         Route::post('/store-product', [ItemManagementController::class, 'storeProduct'])->name('items-management.store-product');
+        Route::post('/updateProductVisibility', [ItemManagementController::class, 'updateProductVisibility'])->name('items-management.updateProductVisibility');
+        Route::post('/store-modifier-item', [ItemManagementController::class, 'storeModifierItem'])->name('items-management.store-modifier-item');
+        Route::post('/store-modifier-group', [ItemManagementController::class, 'storeModifierGroup'])->name('items-management.store-modifier-group');
+        Route::post('/updateModifierItemStatus', [ItemManagementController::class, 'updateModifierItemStatus'])->name('items-management.updateModifierItemStatus');
+        Route::post('/update-modifier-item', [ItemManagementController::class, 'updateModifierItem'])->name('items-management.update-modifier-item');
+        Route::post('/delete-modifier-item', [ItemManagementController::class, 'deleteModifierItem'])->name('items-management.delete-modifier-item');
+        
         
     });
 

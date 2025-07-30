@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->longText('description')->nullable();
             $table->enum('status', ['active', 'inactive'])->nullable();
+            $table->integer('order_no')->autoIncrement();
             $table->softDeletes();
             $table->timestamps();
         });

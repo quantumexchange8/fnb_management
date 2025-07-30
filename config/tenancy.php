@@ -22,6 +22,19 @@ return [
         'localhost',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Paths that should be excluded from tenancy
+    |--------------------------------------------------------------------------
+    |
+    | These paths will not trigger tenancy initialization.
+    |
+    */
+    'excluded_paths' => [
+        'log-viewer*',
+        'vendor*',
+    ],
+
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
      * Their responsibility is making Laravel features tenant-aware.

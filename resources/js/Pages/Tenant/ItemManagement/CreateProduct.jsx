@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import CreateMealModifierGroup from "./Partials/CreateMealModifierGroup";
 import toast from "react-hot-toast";
+import InputError from "@/Components/InputError";
 
 export default function CreateProduct() {
 
@@ -41,7 +42,7 @@ export default function CreateProduct() {
         fetchCategories();
     }, []);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset, isDirty } = useForm({
         item_code: '',
         name: '',
         category_id: null,
@@ -193,7 +194,7 @@ export default function CreateProduct() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('item_code')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-2">
                                         <TextInput 
                                             type='text'
                                             value={data.item_code}
@@ -201,6 +202,7 @@ export default function CreateProduct() {
                                             onChange={(e) => setData('item_code', e.target.value)}
                                             placeholder={t('eg_p01')}
                                         />
+                                        <InputError message={errors.item_code} />
                                     </div>
                                 </div>
                                 <div className="px-5 flex items-center gap-5">
@@ -208,7 +210,7 @@ export default function CreateProduct() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('item_name')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-2">
                                         <TextInput 
                                             type='text'
                                             value={data.name}
@@ -216,6 +218,7 @@ export default function CreateProduct() {
                                             onChange={(e) => setData('name', e.target.value)}
                                             placeholder={t('eg_signature_pork')}
                                         />
+                                        <InputError message={errors.name} />
                                     </div>
                                 </div>
                                 <div className="px-5 flex items-center gap-5">
@@ -223,7 +226,7 @@ export default function CreateProduct() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('category')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-2">
                                         <Select 
                                             value={data.category_id}
                                             onChange={(value) => setData('category_id', value)}
@@ -249,6 +252,7 @@ export default function CreateProduct() {
                                             )}
                                             className="w-full max-w-[328px]"
                                         />
+                                        <InputError message={errors.category_id} />
                                     </div>
                                 </div>
                                 <div className="px-5 flex items-center gap-5">
@@ -256,7 +260,7 @@ export default function CreateProduct() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('sale_price')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-2">
                                         <InputNumber 
                                             prefix='RM '
                                             value={data.sale_price}
@@ -267,6 +271,7 @@ export default function CreateProduct() {
                                             placeholder='12.90'
                                             className="w-full max-w-[328px]"
                                         />
+                                        <InputError message={errors.sale_price} />
                                     </div>
                                 </div>
                                 <div className="px-5 py-2.5 flex items-center gap-5">
@@ -289,7 +294,7 @@ export default function CreateProduct() {
                         </div>
 
                         {/* Modifier group */}
-                        <CreateMealModifierGroup data={data} setData={setData}  />
+                        <CreateMealModifierGroup data={data} setData={setData} isDirty={isDirty}  />
                         
                         {/* Image */}
                         <div className="bg-white border border-neutral-100 shadow-sec-voucher rounded-lg flex flex-col">
@@ -304,10 +309,12 @@ export default function CreateProduct() {
                                     onChange={handleImageChange}
                                     onRemove={handleImageRemove}
                                 >
-                                    <Button size="sm" >
-                                        Upload
+                                    <Button size="md" className="flex items-center gap-2" >
+                                        <PlusIcon />
+                                        <span>{t('upload')}</span>
                                     </Button>
                                 </Upload>
+                                <InputError message={errors.product_image} />
                             </div>
                         </div>
 
@@ -369,6 +376,7 @@ export default function CreateProduct() {
                                 onChange={(e) => setData('category_name', e.target.value)}
                                 placeholder={t('eg_enter_category_name')}
                             />
+                            <InputError message={errors.category_name} />
                         </div>
                         <div className="flex flex-col gap-3 w-full">
                             <InputLabel value={t('visibility')} />

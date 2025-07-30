@@ -16,6 +16,7 @@ class Category extends Model
         'color',
         'description',
         'status',
+        'order_no'
     ];
 
 }

@@ -1,3 +1,6 @@
 {
-    "create_category": "Create Category"
+    "create_category": "Create Category",
+
+    "you_are_leaving_this_page": "You’re leaving this page",
+    "any_change_you_made_wont_be_saved": "Any changes you've made won't be saved if you navigate away from this page. Are you sure you want to continue"
 }

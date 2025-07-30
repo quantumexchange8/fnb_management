@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Category;
 use App\Models\Tenant\ModifierGroup;
+use App\Models\Tenant\ModifierGroupItem;
+use App\Models\Tenant\ModifierItem;
 use App\Models\Tenant\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -43,10 +45,22 @@ class ItemManagementController extends Controller
         return Inertia::render('Tenant/ItemManagement/CreateModifierGroup');
     }
 
+    public function createSetMeal()
+    {
+
+        return Inertia::render('Tenant/ItemManagement/CreateSetMeal');
+    }
+
+    public function manageModifierItem()
+    {
+
+        return Inertia::render('Tenant/ItemManagement/ManageModifierItem');
+    }
+
     public function getCategories(Request $request)
     {
 
-        $categories = Category::where('status', 'active')->get();
+        $categories = Category::where('status', 'active')->orderBy('order_no')->get();
 
         return response()->json([
             'data' => $categories,
@@ -59,12 +73,12 @@ class ItemManagementController extends Controller
 
         $modifiers = ModifierGroup::where('status', 'active')->get();
 
-        return response()->json();
+        return response()->json($modifiers);
     }
 
     public function getProducts(Request $request)
     {
-
+        
         $query = Product::with('category:id,name');
 
         if ($request->filled('category_id') && $request->category_id !== 'all') {
@@ -72,6 +86,19 @@ class ItemManagementController extends Controller
         }
 
         return response()->json($query->paginate(12));
+    }
+
+    public function getModifierItem()
+    {
+
+        $modifierItems = ModifierItem::where('status', 'active')->get();
+
+        $allModifierItems = ModifierItem::get();
+
+        return response()->json([
+            'active' => $modifierItems,
+            'all' => $allModifierItems,
+        ]);
     }
 
     // POST METHOD
@@ -128,6 +155,22 @@ class ItemManagementController extends Controller
         return redirect()->back();
     }
 
+    public function updateCategoryOrders(Request $request)
+    {
+
+        foreach ($request->category_sorting as $sort) {
+
+            $category = Category::find($sort['id']);
+
+            $category->update([
+                'order_no' => $sort['order_no'],
+            ]);
+
+        }
+
+        return redirect()->back();
+    }
+
     public function deleteCategory(Request $request)
     {
 
@@ -149,11 +192,11 @@ class ItemManagementController extends Controller
             'category_id' => 'required',
             'visibility' => 'required|string|max:255',
             'sale_price' => 'required',
-            'product_image' => 'required|image|mimes:jpeg,png,jpg|dimensions:max_width=500,max_height=500',
-            'description' => 'required',
+            // 'product_image' => 'required|image|mimes:jpeg,png,jpg|dimensions:max_width=500,max_height=500',
+            'description' => 'nullable',
         ], [
-            'product_image.dimensions' => 'The image must not be larger than 500x500 pixels.',
-            'product_image.mimes' => 'The image must be a file of type: JPG or PNG.',
+            // 'product_image.dimensions' => 'The image must not be larger than 500x500 pixels.',
+            // 'product_image.mimes' => 'The image must be a file of type: JPG or PNG.',
         ]);
 
         $findCategory = Category::find($request->category_id);
@@ -192,4 +235,121 @@ class ItemManagementController extends Controller
 
         return redirect()->back();
     }
+
+    public function updateProductVisibility(Request $request)
+    {
+
+        $findProduct = Product::find($request->id);
+
+        $findProduct->visibility = $request->visibility;
+        $findProduct->save();
+
+        return redirect()->back();
+    }
+
+    public function storeModifierItem(Request $request)
+    {
+
+        $request->validate([
+            'modifier_name' => 'required|string|max:255|unique:modifier_items',
+            'price' => 'required',
+        ]);
+
+        $createItem = ModifierItem::create([
+            'modifier_name' => $request->modifier_name,
+            'price' => $request->price,
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function storeModifierGroup(Request $request)
+    {
+        // dd($request->all());
+
+        $request->validate([
+            'group_name' => 'required|string|max:255',
+            'display_name' => 'required|string|max:255',
+            'min_value' => 'required',
+            'max_value' => 'required',
+            'overide' => 'required',
+            'modifier_item' => 'required|array|min:1',
+            'modifier_item.*.modifier_name' => 'required|string|max:255',
+            'modifier_item.*.price' => 'required|numeric', // or use 'required' if price can be non-numeric
+        ]);
+
+        $modifierGroup = ModifierGroup::create([
+            'group_name' => $request->group_name,
+            'display_name' => $request->display_name,
+            'group_type' => $request->group_type,
+            'min_selection' => $request->min_value,
+            'max_selection' => $request->max_value,
+            'overide' => $request->overide,
+            'status' => 'active',
+        ]);
+
+        foreach ($request->modifier_item as $item) {
+
+            $modifierGroupItem = ModifierGroupItem::create([
+                'modifier_group_id' => $modifierGroup->id,
+                'modifier_item_id' => $item['id'],
+                'modifier_name' => $item['modifier_name'],
+                'modifier_price' => $item['price'],
+                'default' => $item['default'],
+                'status' => $item['status'],
+                'sort_order' => $item['sort_order'],
+            ]);
+
+        }
+
+        return redirect()->back();
+    }
+
+    public function updateModifierItemStatus(Request $request)
+    {
+
+        $findItem = ModifierItem::find($request->id);
+
+        $findItem->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function updateModifierItem(Request $request)
+    {
+
+        $request->validate([
+            'modifier_name' => $request->modifier_name,
+            'price' => $request->price,
+        ]);
+
+        $findItem = ModifierItem::find($request->id);
+
+        $findItem->update([
+            'modifier_name' => $request->modifier_name,
+            'price' => $request->price,
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function deleteModifierItem(Request $request)
+    {
+
+        $findItem = ModifierItem::find($request->id);
+
+        $checkItemIsUsing = ModifierGroupItem::where('modifier_item_id', $findItem->id)->first();
+
+        if ($checkItemIsUsing) {
+
+            return redirect()->back()->withErrors(['Errors' => 'Modifier group is in use']);
+        }
+
+        $findItem->delete();
+
+        return redirect()->back();
+    }
+
 }

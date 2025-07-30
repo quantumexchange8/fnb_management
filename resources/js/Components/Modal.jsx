@@ -71,7 +71,7 @@ export default function Modal({
                     <DialogPanel
                         className={`flex flex-col transform overflow-hidden rounded-lg shadow-dialog bg-white transition-all sm:mx-auto sm:w-full ${maxWidthClass} ${maxHeightClass}`}
                     >
-                        <DialogTitle className='w-full flex justify-between items-center py-4 px-6'>
+                        <DialogTitle className='w-full flex justify-between items-center py-4 px-5'>
                             <div className='text-gray-950 text-lg font-semibold'>{title}</div>
                             <CloseButton onClick={close}>
                                 <XIcon />

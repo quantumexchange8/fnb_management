@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('modifier_group_id');
             $table->unsignedBigInteger('modifier_item_id');
+            $table->string('modifier_name');
+            $table->decimal('modifier_price', 13, 2)->default(0.00);
+            $table->integer('default')->nullable();
             $table->integer('sort_order')->default(0);
             $table->enum('status', ['active', 'inactive']);
             $table->softDeletes();
