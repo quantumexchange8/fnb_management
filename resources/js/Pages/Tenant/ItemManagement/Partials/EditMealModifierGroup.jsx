@@ -9,7 +9,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-export default function CreateMealModifierGroup({ data, setData, isDirty }) {
+export default function EditMealModifierGroup({ data, setData, isDirty }) {
 
     const { t, i18n } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
@@ -41,17 +41,24 @@ export default function CreateMealModifierGroup({ data, setData, isDirty }) {
         fetchModifier();
     }, []);
 
+    useEffect(() => {
+        if (data?.modifier_group?.length > 0) {
+            setSelectedModifierItem(data.modifier_group);
+        }
+    }, [data.modifier_group]);
+
+
     const openAddModifier = () => {
         setIsModifierOpen(true)
     }
     const closeAddModifier = () => {
         setIsModifierOpen(false);
-        setSelectedModifierItem([])
     }
 
     const filterGetModifier = getModifier.filter((item) =>
         item.group_name.toLowerCase().includes(searchFilter.toLowerCase())
     );
+    
     const clearFilter = () => {
         setSearchFilter('');
     }
@@ -191,6 +198,7 @@ export default function CreateMealModifierGroup({ data, setData, isDirty }) {
         setData((prevData) => ({
             ...prevData,
             modifier_group: (prevData.modifier_group || []).filter(g => g.id !== updatedGroupId),
+            deleted_modifier_group: [updatedGroupId],
         }));
     };
     
@@ -223,6 +231,10 @@ export default function CreateMealModifierGroup({ data, setData, isDirty }) {
                                                     <div className="flex rounded-[100px] bg-error-500 py-0.5 px-3 uppercase text-error-50 text-xss font-bold">
                                                         {t('required')}
                                                     </div>
+                                                ) : group.modifier_group?.group_type === 'required' ? (
+                                                    <div className="flex rounded-[100px] bg-error-500 py-0.5 px-3 uppercase text-error-50 text-xss font-bold">
+                                                        {t('required')}
+                                                    </div>
                                                 ) : (
                                                     <div className="flex rounded-[100px] bg-neutral-50 py-0.5 px-3 uppercase text-neutral-300 text-xss font-bold">
                                                         {t('optional')}
@@ -231,7 +243,7 @@ export default function CreateMealModifierGroup({ data, setData, isDirty }) {
                                             }
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <div className="text-neutral-950 text-base font-bold truncate">{group.group_name} ({group.modifier_group_items?.length})</div>
+                                            <div className="text-neutral-950 text-base font-bold truncate">{group.modifier_group ? group.modifier_group.group_name : group.group_name} ({group.modifier_group_items?.length})</div>
                                             <div className="text-wrap text-neutral-400 text-sm ">
                                                 {
                                                     group.modifier_group_items?.map(g => g.modifier_name).join(', ')

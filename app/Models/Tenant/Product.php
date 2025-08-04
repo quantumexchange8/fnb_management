@@ -25,4 +25,8 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
+    public function product_modifier_group(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductModifierGroup::class, 'product_id', 'id');
+    }
 }

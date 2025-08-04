@@ -1,11 +1,36 @@
 import TenantAuthenicatedLayout from "@/Layouts/TenantAuthenicatedLayout";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import GeneralDetails from "./PartialsCreateSet/GeneralDetails";
+import AddItemSet from "./PartialsCreateSet/AddItemSet";
+import AvailabilityInventory from "./PartialsCreateSet/AvailabilityInventory";
+import Button from "@/Components/Button";
+import { NextIcon, PreviousIcon } from "@/Components/Icon/Outline";
+import { useForm } from "@inertiajs/react";
 
 export default function CreateSetMeal() {
 
     const { t, i18n } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
+    const [step, setStep] = useState(1);
+
+    const next = () => {
+        const next = step + 1;
+        setStep(next)
+    }
+    const prev = () => {
+        const prev = step - 1;
+        setStep(prev)
+    }
+
+    const { data, setData, post, processing, errors, reset, isDirty } = useForm({
+        set_code: '',
+        
+    });
+
+    const submit = () => {
+
+    }
 
     return (
         <TenantAuthenicatedLayout>
@@ -20,13 +45,84 @@ export default function CreateSetMeal() {
                     <div className="flex flex-col gap-5">
                         {/* Stepper */}
                         <div className="flex items-center gap-4">
-
+                            <div className="flex items-center gap-2">
+                                <div className="p-1 bg-primary-500 rounded-full text-neutral-25 text-xs font-bold text-center"> 
+                                    <div className="w-[14px]">1</div>
+                                </div>
+                                <div className="text-neutral-900 text-base font-bold">{t('general_detail')}</div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className={`${step === 2 || step === 3 ? 'bg-primary-500 text-neutral-25' : 'bg-neutral-50 text-neutral-200'} p-1 rounded-full text-xs font-bold text-center`}> 
+                                    <div className="w-[14px]">2</div>
+                                </div>
+                                <div className={`${step === 2 || step === 3 ? 'text-neutral-900' : 'text-neutral-200'}  text-base `}>{t('add_item_to_this_set')}</div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className={`${step === 3 ? 'bg-primary-500 text-neutral-25' : 'bg-neutral-50 text-neutral-200'} p-1 rounded-full text-xs font-bold text-center`}> 
+                                    <div className="w-[14px]">3</div>
+                                </div>
+                                <div className={`${step === 3 ? 'text-neutral-900' : 'text-neutral-200'}  text-base `}>{t('availability_&_inventory')}</div>
+                            </div>
                         </div>
                         
                         {/* content */}
-                        <div>
-                            
-                        </div>
+                        {
+                            step === 1 && (
+                                <GeneralDetails data={data} setData={setData} errors={errors} />
+                            )
+                        }
+                        {
+                            step === 2 && (
+                                <AddItemSet data={data} setData={setData} errors={errors} />
+                            )
+                        }
+                        {
+                            step === 3 && (
+                                <AvailabilityInventory />
+                            )
+                        }
+                    </div>
+                </div>
+
+                {/* sticky bar */}
+                <div className="sticky bottom-0 w-full px-4">
+                    <div className="w-full py-4 px-5 bg-white flex items-center justify-between border-t border-[#d0471833] shadow-footer">
+                        <Button size="md" variant="white">
+                            {t('cancel')}
+                        </Button>
+                        {
+                            step === 1  && (
+                                <Button size="md" onClick={next} disabled={isLoading} className="flex items-center gap-2" >
+                                    <span>{t('next')}</span>
+                                    <NextIcon />
+                                </Button>
+                            )
+                        }
+                        {
+                            step === 2 && (
+                                <div className="flex items-center gap-3">
+                                    <Button size="md" variant="white" onClick={prev} className="flex items-center gap-2">
+                                        <PreviousIcon />
+                                        <span>{t('previous')}</span>
+                                    </Button>
+                                    <Button size="md" onClick={next} className="flex items-center gap-2">
+                                        <span>{t('next')}</span>
+                                        <NextIcon />
+                                    </Button>
+                                </div>
+                            )
+                        }
+                        {
+                            step === 3 && (
+                                <div className="flex items-center gap-3">
+                                    <Button size="md" variant="white" onClick={prev} className="flex items-center gap-2">
+                                        <PreviousIcon />
+                                        <span>{t('previous')}</span>
+                                    </Button>
+                                    <Button size="md" onClick={submit}>{t('create_now')}</Button>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>

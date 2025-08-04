@@ -35,7 +35,7 @@ export default function Navbar({ user, header, toggleSidebar }) {
     }, [])
 
     return (
-        <nav className={`sticky top-0 z-10 ease-in duration-500 w-full md:shadow-navbar`}>
+        <nav className={`sticky top-0 z-20 ease-in duration-500 w-full md:shadow-navbar`}>
             <div className='flex items-center justify-between bg-neutral-25 p-4'>
                 <div className='flex items-center gap-6'>
                     <div className='p-2.5 border border-neutral-200 shadow-[0_1px_2px_0_rgba(9,9,11,0.05)] cursor-pointer hover:bg-neutral-50 rounded-full' onClick={toggleSidebar}>

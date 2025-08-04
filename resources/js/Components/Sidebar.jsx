@@ -61,9 +61,9 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
 
     return (
         <>
-            <div className={`${expanded ? 'fixed inset-0 z-20 bg-black/50 md:hidden' : ''} `} onClick={toggleSidebar}></div>
+            <div className={`${expanded ? 'fixed inset-0 z-30 bg-black/50 md:hidden' : ''} `} onClick={toggleSidebar}></div>
             <aside className={`
-                    fixed inset-y-0 z-20 max-w-60 bg-gray-25 overflow-hidden
+                    fixed inset-y-0 z-30 max-w-60 bg-gray-25 overflow-hidden
                     shadow-container min-h-screen bg-neutral-800
                     scrollbar-thin scrollbar-webkit
                     transition-all duration-300 ease-in-out

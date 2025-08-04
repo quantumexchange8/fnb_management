@@ -557,6 +557,32 @@ const GripLine2lIcon = () => {
     );
 }
 
+const RemoveProductIcon = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect width="20" height="20" rx="10" fill="#E4E4E7" fillOpacity="0.5"/>
+            <path d="M12.8569 7.14258L7.14258 12.8569M7.14258 7.14258L12.8569 12.8569" stroke="#F26522" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
+
+const PreviousIcon = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M15 14.1673L10.8333 10.0007L15 5.83398M9.16667 14.1673L5 10.0007L9.16667 5.83398" stroke="#09090B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
+
+const NextIcon = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 14.1673L9.16667 10.0007L5 5.83398M10.8333 14.1673L15 10.0007L10.8333 5.83398" stroke="#FEECD2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
+
+
 
 
 export { 
@@ -616,4 +642,7 @@ export {
     HiddenIcon,
     GripVerticalIcon,
     GripLine2lIcon,
+    RemoveProductIcon,
+    PreviousIcon,
+    NextIcon,
 };

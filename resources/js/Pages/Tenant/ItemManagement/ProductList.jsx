@@ -151,6 +151,10 @@ export default function ProductList() {
         }
     };
 
+    const editProduct = (product) => {
+        window.location.href = `/items-management/edit-product/${product.item_code}`
+    }
+
     return (
         <TenantAuthenicatedLayout>
             <div className="flex flex-col w-full">
@@ -184,7 +188,7 @@ export default function ProductList() {
                                     <Skeleton.Button active block={true} />
                                 </>
                             ) : (
-                                <div className="flex items-center gap-3 flex-nowrap overflow-x-auto">
+                                <div className="flex items-center gap-3 flex-nowrap overflow-x-auto bg-neutral-25 sticky top-[74px] z-20">
                                     {
                                         getCategory.length > 0 && getCategory.map((category) => (
                                             <div
@@ -228,7 +232,7 @@ export default function ProductList() {
 
 
                                                             return (
-                                                                <div key={index} className="p-4 flex flex-col gap-4 rounded-xl bg-white border border-neutral-50 shadow-sec-voucher">
+                                                                <div key={index} className="p-4 flex flex-col gap-4 rounded-xl bg-white border border-neutral-50 shadow-sec-voucher cursor-pointer" onClick={() => editProduct(product)} >
                                                                     <div className='py-10 px-4 relative bg-neutral-50 rounded-xl'>
                                                                         <img src='' alt="" className="max-w-[180px] h-[140px] " />
                                                                         {product.visibility === 'hidden' && (

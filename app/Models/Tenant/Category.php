@@ -19,4 +19,9 @@ class Category extends Model
         'order_no'
     ];
 
+    public function product(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Product::class, 'category_id', 'id');
+    }
+
 }
