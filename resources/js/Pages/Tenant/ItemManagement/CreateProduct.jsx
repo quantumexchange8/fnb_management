@@ -264,7 +264,7 @@ export default function CreateProduct() {
                                         <InputNumber 
                                             prefix='RM '
                                             value={data.sale_price}
-                                            min='0.01'
+                                            min='0'
                                             step="0.01"
                                             onChange={(value) => setData('sale_price', value)}
                                             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}

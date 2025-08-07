@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Tenant\DashboardController;
+use App\Http\Controllers\Tenant\GlobalController;
 use App\Http\Controllers\Tenant\ItemManagementController;
 use App\Http\Controllers\Tenant\MemberController;
 use Illuminate\Foundation\Application;
@@ -56,6 +57,13 @@ Route::middleware('auth:tenant')->group(function () {
 
     /**
      * ==============================
+     *     Global routes
+     * ==============================
+    */
+    Route::get('/getBranch', [GlobalController::class, 'getBranch'])->name('getBranch');
+
+    /**
+     * ==============================
      *     Item Management Routes
      * ==============================
     */
@@ -70,6 +78,7 @@ Route::middleware('auth:tenant')->group(function () {
         Route::get('/manage-modifier-item', [ItemManagementController::class, 'manageModifierItem'])->name('items-management.manage-modifier-item');
         Route::get('/edit-modifier-group/{id}', [ItemManagementController::class, 'editModifierGroup'])->name('items-management.edit-modifier-group');
         Route::get('/edit-product/{id}', [ItemManagementController::class, 'editProduct'])->name('items-management.edit-product');
+        Route::get('/set-meal-listing', [ItemManagementController::class, 'setMealListing'])->name('items-management.set-meal-listing');
 
         Route::get('/getCategories', [ItemManagementController::class, 'getCategories'])->name('items-management.getCategories');
         Route::get('/getModifier', [ItemManagementController::class, 'getModifier'])->name('items-management.getModifier');
@@ -77,6 +86,7 @@ Route::middleware('auth:tenant')->group(function () {
         Route::get('/getModifierItem', [ItemManagementController::class, 'getModifierItem'])->name('items-management.getModifierItem');
         Route::get('/getModifierGroup', [ItemManagementController::class, 'getModifierGroup'])->name('items-management.getModifierGroup');
         Route::get('/getMealItem', [ItemManagementController::class, 'getMealItem'])->name('items-management.getMealItem');
+        Route::get('/getSetMeal', [ItemManagementController::class, 'getSetMeal'])->name('items-management.getSetMeal');
         
         Route::post('/store-category', [ItemManagementController::class, 'storeCategory'])->name('items-management.store-category');
         Route::post('/updateCategoryVisibility', [ItemManagementController::class, 'updateCategoryVisibility'])->name('items-management.updateCategoryVisibility');
@@ -94,6 +104,9 @@ Route::middleware('auth:tenant')->group(function () {
         Route::post('/update-modifier-group', [ItemManagementController::class, 'updateModifierGroup'])->name('items-management.update-modifier-group');
         Route::post('/delete-modifier-group', [ItemManagementController::class, 'deleteModifierGroup'])->name('items-management.delete-modifier-group');
         Route::post('/update-product', [ItemManagementController::class, 'updateProduct'])->name('items-management.update-product');
+        Route::post('/validate-set-meals', [ItemManagementController::class, 'validateSetMeals'])->name('items-management.validate-set-meals');
+        Route::post('/store-set-meals', [ItemManagementController::class, 'storeSetMeals'])->name('items-management.store-set-meals');
+        Route::post('/updateMealVisibility', [ItemManagementController::class, 'updateMealVisibility'])->name('items-management.updateMealVisibility');
         
     });
 

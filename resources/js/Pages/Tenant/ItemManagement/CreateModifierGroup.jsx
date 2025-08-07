@@ -520,6 +520,8 @@ export default function CreateModifierGroup() {
                     variant: 'variant3',
                 });
                 reset();
+                setSelectedItemToEdit(null);
+                setSelectedModifierItem([]);
             },
             onError: () => {
                 setIsLoading(false);

@@ -582,7 +582,46 @@ const NextIcon = () => {
     );
 }
 
+const MinusIcon = ({ className }) => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M6 12H18" stroke="currentColor" strokeWidth="1.85164" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
 
+const XIcon4 = ({ className }) => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect width="20" height="20" rx="10" fill="#E4E4E7" fillOpacity="0.5"/>
+            <path d="M12.8574 7.14258L7.14307 12.8569M7.14307 7.14258L12.8574 12.8569" stroke="#F26522" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
+
+const QtyBg = ({ className }) => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} width="45" height="45" viewBox="0 0 45 45" fill="none">
+            <path d="M0 42V0H42L0 42Z" fill="#F26522" stroke="#F26522" strokeWidth="1.85"/>
+        </svg>
+    );
+}
+
+const RemoveGroupIcon = ({ className }) => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3.33301 8H12.6663" stroke="#FFF4ED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
+
+const SuccessIcon = ({ className }) => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M11.4446 3.66797L5.33344 9.77908L2.55566 7.0013" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    );
+}
 
 
 export { 
@@ -645,4 +684,9 @@ export {
     RemoveProductIcon,
     PreviousIcon,
     NextIcon,
+    MinusIcon,
+    XIcon4,
+    QtyBg,
+    RemoveGroupIcon,
+    SuccessIcon,
 };

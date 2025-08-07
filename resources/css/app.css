@@ -135,3 +135,17 @@ select:focus,
     background: #FEECD2;
     border: 1px solid #FDD3A6;
 }
+
+/* Ant select */
+
+.custom-select .ant-select-selector {
+  padding: 8px;
+}
+
+.custom-select .ant-select-selection-item {
+  background-color: white !important;
+  color: black;
+  border: 1px solid #E4E4E7 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 1px 0 rgba(46, 46, 46, 0.09);
+}

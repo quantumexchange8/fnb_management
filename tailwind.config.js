@@ -17,9 +17,11 @@ export default {
             },
             backgroundImage: {
                 'gradient-hidden': 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 27.16%, rgba(242, 101, 34, 0.95) 418.27%)',
+                'active-step': 'linear-gradient(68deg, #FCFCFC 38.84%, #A6A6A6 405.14%)',
             },
             colors: {
                 primary: {
+                    25: '#FFF8EE',
                     50: '#FFF3E1',
                     100: '#FEECD2',
                     200: '#FDD3A6',
@@ -103,6 +105,7 @@ export default {
                 'sec-voucher': '0px -1px 16.9px 0px rgba(0, 0, 0, 0.05)',
                 'action': '0px 1.143px 2.286px 0px rgba(9, 9, 11, 0.05)',
                 'footer': '0px 2px 34.6px 0px rgba(9, 9, 11, 0.05)',
+                'button': '0 -3px 0 0 rgba(93, 93, 93, 0.04) inset, 0 1px 2px 0 rgba(9, 9, 11, 0.05)',
             }
         },
         fontSize: {

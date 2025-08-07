@@ -47,7 +47,7 @@ export default ({
             variantClasses = `bg-error-100 text-error-500 hover:bg-error-200 hover:text-error-700 disabled:bg-error-50 disabled:text-error-200 `
             break
         case 'textOnly':
-            variantClasses = `bg-transparent text-primary-500 underline hover:text-primary-500 hover:bg-primary-100 hover:no-underline disabled:text-primary-200 disabled:bg-transparent disabled:no-underline`
+            variantClasses = `bg-transparent text-primary-500 hover:text-primary-500 hover:no-underline disabled:text-primary-200 disabled:bg-transparent disabled:no-underline`
             break
         default:
             variantClasses = `bg-primary-500 text-white text-sm hover:bg-primary-600 hover:border hover:border-primary-600 hover:text-primary-100 disabled:text-primary-100 disabled:bg-primary-200 rounded-xl`

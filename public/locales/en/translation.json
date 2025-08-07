@@ -2,5 +2,8 @@
     "create_category": "Create Category",
 
     "you_are_leaving_this_page": "You’re leaving this page",
-    "any_change_you_made_wont_be_saved": "Any changes you've made won't be saved if you navigate away from this page. Are you sure you want to continue"
+    "any_change_you_made_wont_be_saved": "Any changes you've made won't be saved if you navigate away from this page. Are you sure you want to continue",
+
+    
+    "customer_can_choose_more_than_one_item_from_the_group": "Customer can choose only one item from the group"
 }

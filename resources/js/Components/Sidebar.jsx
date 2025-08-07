@@ -26,6 +26,7 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
         { name: "Create Category", path: "/items-management/create-category" },
         { name: "Product List", path: "/items-management/product-list" },
         { name: "Create Product", path: "/items-management/create-product" },
+        { name: "Set Meal List", path: "/items-management/set-meal-listing" },
         { name: "Create Set Meal", path: "/items-management/create-set-meal" },
         { name: "Modifier Group List", path: "/items-management/modifier-group-list" },
         { name: "Create Modifier Group", path: "/items-management/create-modifier-group" },

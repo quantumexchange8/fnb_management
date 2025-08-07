@@ -7,12 +7,13 @@ import { Editor } from "primereact/editor";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function GeneralDetails({ data, setData, errors }) {
+export default function GeneralDetails({ data, setData, errors, getErrors }) {
 
     const { t, i18n } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [getCategory, setGetCategory] = useState([]);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const fetchCategories = async () => {
         setIsLoading(true);
@@ -47,7 +48,7 @@ export default function GeneralDetails({ data, setData, errors }) {
         const file = info.file;
 
         setFileList([file]);
-        setData('product_image', file); // `image` key matches your form field
+        setData('set_image', file); // `image` key matches your form field
         
         setTimeout(() => {
             setUploading(false);
@@ -55,7 +56,7 @@ export default function GeneralDetails({ data, setData, errors }) {
     }
     const handleImageRemove = () => {
         setFileList([]);
-        setData('product_image', null);
+        setData('set_image', null);
     };
 
     const renderHeader  = () =>{
@@ -106,7 +107,7 @@ export default function GeneralDetails({ data, setData, errors }) {
                                 onChange={(e) => setData('set_code', e.target.value)}
                                 placeholder={t('eg_set0001')}
                             />
-                            <InputError message={errors.set_code} />
+                            <InputError message={getErrors.set_code} />
                         </div>
                     </div>
                     <div className="px-5 flex items-center gap-5">
@@ -117,12 +118,12 @@ export default function GeneralDetails({ data, setData, errors }) {
                         <div className="w-full flex flex-col gap-2">
                             <TextInput 
                                 type='text'
-                                value={data.set_code}
+                                value={data.set_name}
                                 className="w-full max-w-[328px]"
-                                onChange={(e) => setData('set_code', e.target.value)}
+                                onChange={(e) => setData('set_name', e.target.value)}
                                 placeholder={t('eg_set0001')}
                             />
-                            <InputError message={errors.set_code} />
+                            <InputError message={getErrors.set_name} />
                         </div>
                     </div>
                     <div className="px-5 flex items-center gap-5">
@@ -133,15 +134,15 @@ export default function GeneralDetails({ data, setData, errors }) {
                         <div className="w-full flex flex-col gap-2">
                             <InputNumber 
                                 suffix=' pax'
-                                value={data.pax}
+                                value={data.no_of_pax}
                                 min='1'
                                 step="1"
-                                onChange={(value) => setData('pax', value)}
+                                onChange={(value) => setData('no_of_pax', value)}
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                 placeholder='2'
                                 className="w-full max-w-[328px]"
                             />
-                            <InputError message={errors.set_code} />
+                            <InputError message={getErrors.no_of_pax} />
                         </div>
                     </div>
                     <div className="px-5 flex items-center gap-5">
@@ -175,7 +176,7 @@ export default function GeneralDetails({ data, setData, errors }) {
                                 )}
                                 className="w-full max-w-[328px]"
                             />
-                            <InputError message={errors.set_code} />
+                            <InputError message={getErrors.category_id} />
                         </div>
                     </div>
                 </div>
@@ -197,7 +198,7 @@ export default function GeneralDetails({ data, setData, errors }) {
                             <span>{t('upload')}</span>
                         </Button>
                     </Upload>
-                    <InputError message={errors.product_image} />
+                    <InputError message={getErrors.set_image} />
                 </div>
             </div>
             <div className="bg-white border border-neutral-100 shadow-sec-voucher rounded-lg flex flex-col">

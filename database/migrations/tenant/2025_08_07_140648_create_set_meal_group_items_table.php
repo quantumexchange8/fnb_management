@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('set_meal_groups', function (Blueprint $table) {
+        Schema::create('set_meal_group_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('set_meal_id');
-            $table->string('group_name');
-            $table->string('group_type');
-            $table->string('group_selectable_type');
-            $table->integer('min_select');
-            $table->integer('max_select');
-            $table->integer('sort_order')->default(0);
+            $table->unsignedBigInteger('set_meal_group_id');
+            $table->unsignedBigInteger('product_id');
+            $table->decimal('original_price', 13, 2);
+            $table->decimal('additional_charge', 13, 2);
+            $table->integer('quantity');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('set_meal_groups');
+        Schema::dropIfExists('set_meal_group_items');
     }
 };

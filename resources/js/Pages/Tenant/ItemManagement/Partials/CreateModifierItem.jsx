@@ -20,7 +20,7 @@ export default function CreateModifierItem({
 
     const { data, setData, post, processing, errors, reset, isDirty } = useForm({
         modifier_name: '',
-        price: '',
+        price: 0.00,
     }); 
 
     const cancelModifierItem = () => {
@@ -84,7 +84,7 @@ export default function CreateModifierItem({
                         <InputLabel value={t('price')} />
                         <InputNumber 
                             prefix='RM '
-                            value={data.price || 0.00}
+                            value={data.price ?? 0.00}
                             min='0.00'
                             step="0.01"
                             onChange={(value) => setData('price', value)}

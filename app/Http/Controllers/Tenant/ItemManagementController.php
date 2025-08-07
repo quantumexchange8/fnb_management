@@ -11,7 +11,12 @@ use App\Models\Tenant\ModifierMealItem;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductModifierGroup;
 use App\Models\Tenant\ProductModifierGroupItem;
+use App\Models\Tenant\SetMeal;
+use App\Models\Tenant\SetMealGroup;
+use App\Models\Tenant\SetMealGroupItem;
+use App\Models\Tenant\SetMealItem;
 use App\Services\RunningNumberService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -60,6 +65,12 @@ class ItemManagementController extends Controller
     {
 
         return Inertia::render('Tenant/ItemManagement/ManageModifierItem');
+    }
+
+    public function setMealListing()
+    {
+
+        return Inertia::render('Tenant/ItemManagement/SetMealListing');
     }
 
     public function editModifierGroup($id)
@@ -210,6 +221,21 @@ class ItemManagementController extends Controller
         return response()->json($category);
     }
 
+    public function getSetMeal(Request $request)
+    {
+        $setMeal = SetMeal::with([
+            'set_meal_item',
+            'set_meal_item.product',
+            'set_meal_group',
+            'set_meal_group.set_meal_group_item',
+            'set_meal_group.set_meal_group_item.product',
+        ]);
+
+        $setMeal->latest();
+
+        return response()->json($setMeal->paginate(12));
+    }
+
 
     // POST METHOD
 
@@ -314,18 +340,14 @@ class ItemManagementController extends Controller
         if (!$findCategory) {
 
             foreach ($request->new_category as $category) {
-                if ($category['id'] === $request->category_id) {
-
-                    $findCategory = Category::create([
-                        'name' => $category['name'],
-                        'visibility' => $category['category_visibility'],
-                        'color' => $category['color'],
-                        'description' => $category['description'],
-                        'status' => 'active',
-                    ]);
-                }
+                Category::create([
+                    'name' => $category['name'],
+                    'visibility' => $category['category_visibility'],
+                    'color' => $category['color'],
+                    'description' => $category['description'],
+                    'status' => 'active',
+                ]);
             }
-
         }
 
         $product = Product::create([
@@ -407,7 +429,7 @@ class ItemManagementController extends Controller
             'max_value' => 'required',
             'overide' => 'required',
             'modifier_item' => 'required|array|min:1',
-            'meal_items' => 'required|array|min:1',
+            // 'meal_items' => 'required|array|min:1',
             'modifier_item.*.modifier_name' => 'required|string|max:255',
             'modifier_item.*.price' => 'required|numeric', // or use 'required' if price can be non-numeric
         ]);
@@ -436,11 +458,13 @@ class ItemManagementController extends Controller
             ]);
         }
 
-        foreach ($request->meal_items as $item) {
-            $prodModifierGroup = ProductModifierGroup::create([
-                'modifier_group_id' => $modifierGroup->id,
-                'product_id' => $item['id'],
-            ]);
+        if (!empty($request->meal_items)) {
+            foreach ($request->meal_items as $item) {
+                $prodModifierGroup = ProductModifierGroup::create([
+                    'modifier_group_id' => $modifierGroup->id,
+                    'product_id' => $item['id'],
+                ]);
+            }
         }
 
         return redirect()->back();
@@ -727,6 +751,118 @@ class ItemManagementController extends Controller
             }
         }
         
+
+        return redirect()->back();
+    }
+
+    public function validateSetMeals(Request $request)
+    {
+        // dd($request->all());
+        $step = $request->input('step');
+
+        if ($step == 1) {
+            $request->validate([
+                'set_code' => 'required|string|unique:set_meals',
+                'set_name' => 'required|string',
+                'no_of_pax' => 'required|integer|min:1',
+                'category_id' => 'required|integer',
+            ]);
+        }
+
+        if ($step == 2) {
+            $request->validate([
+                'fixed_item' => 'required|array|min:1',
+                'selectable_group' => 'required|array|min:1',
+                'price_setting' => 'required',
+                'base_price' => 'required',
+            ]);
+        }
+
+        return response()->json(['message' => 'Validation passed']);
+    }
+
+    public function storeSetMeals(Request $request)
+    {
+        $request->validate([
+            'branch' => 'required|array|min:1',
+            'available_day' => 'required',
+            'available_time' => 'required',
+            'specify_day' => 'required_if:available_day,specific-day',
+            'specify_start_time' => 'required_if:available_time,specific-time',
+            'specify_end_time' => 'required_if:available_time,specific-time',
+            'stock_alert' => 'required',
+            'low_stock' => 'required_if:stock_alert,enable',
+        ]);
+
+        $setMeal = SetMeal::create([
+            'set_name' => $request->set_name,
+            'set_code' => $request->set_code,
+            'no_of_pax' => $request->no_of_pax,
+            'category_id' => $request->category_id,
+            'visibility' => 'display',
+            'description' => $request->description ?? null,
+            'price_setting' => $request->price_setting,
+            'base_price' => $request->base_price,
+            'branch_id' => json_encode($request->branch),
+            'available_days' => $request->available_day,
+            'specific_days' => $request->specify_day,
+            'available_time' => $request->available_time,
+            'available_from' => Carbon::parse($request->specify_start_time)
+                                ->setTimezone('Asia/Kuala_Lumpur')
+                                ->format('H:i:s'),
+            'available_to' => Carbon::parse($request->specify_end_time)
+                                ->setTimezone('Asia/Kuala_Lumpur')
+                                ->format('H:i:s'),
+            'stock_alert' => $request->stock_alert,
+            'low_stock_threshold' => $request->low_stock ?? 0,
+            'status' => 'active',
+        ]);
+
+        foreach ($request->fixed_item as $fItem) {
+
+            $fixedItem = SetMealItem::create([
+                'set_meal_id' => $setMeal->id,
+                'product_id' => $fItem['id'],
+                'quantity' => $fItem['quantity'],
+                'status' => 'active',
+            ]);
+
+        }
+
+        foreach ($request->selectable_group as $group) {
+
+            $selectedGroup = SetMealGroup::create([
+                'set_meal_id' => $setMeal->id,
+                'group_name' => $group['group_name'],
+                'group_type' => $group['group_type'],
+                'group_selectable_type' => $group['group_selectable_type'],
+                'min_select' => $group['group_type'] === 'single-select' ? 1 : $group['min_select'],
+                'max_select' => $group['group_type'] === 'single-select' ? 1 : $group['max_select'],
+                'sort_order' => $group['sort_order'] ?? 0,
+            ]);
+
+            foreach ($group['group_option'] as $opt) {
+
+                $groupItem = SetMealGroupItem::create([
+                    'set_meal_group_id' => $selectedGroup->id,
+                    'product_id' => $opt['id'],
+                    'original_price' => $opt['prices'],
+                    'additional_charge' => $opt['additional_charge'],
+                    'quantity' => $opt['quantity'],
+                ]);
+            }
+        }
+
+        return redirect()->back();
+    }
+
+    public function updateMealVisibility(Request $request)
+    {
+
+        $findSetMeal = SetMeal::find($request->id);
+
+        $findSetMeal->visibility = $request->visibility;
+        $findSetMeal->save();
 
         return redirect()->back();
     }
