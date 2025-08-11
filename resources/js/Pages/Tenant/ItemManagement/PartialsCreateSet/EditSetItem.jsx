@@ -9,9 +9,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SelectableGroup from "./SelectableGroup";
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from "react-hot-toast";
 
-export default function AddItemSet({ data, setData, errors, getErrors, enableDeleteOpen, setEnableDeleteOpen }) {
+export default function EditSetItem({ data, setData, errors, getErrors }) {
 
     const { t, i18n } = useTranslation();
     const [getCategory, setGetCategory] = useState();
@@ -20,8 +19,10 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
     const [isLoading, setIsLoading] = useState(false);
     const [searchFilterMeal, setSearchFilterMeal] = useState('');
     const [isSelectableGrpOpen, setIsSelectableGrpOpen] = useState(false);
-    
+    const [enableDeleteOpen, setEnableDeleteOpen] = useState(false);
     const [tempSelectableGroup, setTempSelectableGroup] = useState(null);
+    const [isEditGroupItemOpen, setIsEditGroupItemOpen] = useState(false);
+    const [selectedGroupItemOpen, setSelectedGroupItemOpen] = useState(false);
     const [isEditSelectableGrpOpen, setIsEditSelectableGrpOpen] = useState(false);
     const [editSelectableItem, setEditSelectableItem] = useState(null);
 
@@ -44,6 +45,34 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
     useEffect(() => {
         fetchMealItem();
     }, [])
+
+    useEffect(() => {
+        if (!data.fixed_item) return;
+
+        const updated = getMealItem.map(category => {
+            return {
+                ...category,
+                product: category.product.map(product => {
+                    const match = data.fixed_item.find(item => item.product_id === product.id);
+                    if (match) {
+                        return {
+                            ...product,
+                            checked: true,
+                            quantity: match.quantity || 1
+                        };
+                    }
+                    return {
+                        ...product,
+                        checked: false,
+                        quantity: undefined
+                    };
+                })
+            };
+        });
+
+        setGetMealItem(updated);
+    }, [data.fixed_item]);
+
 
     const clearSearchFilter = () => {
         setSearchFilterMeal('');
@@ -82,12 +111,6 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
     const updateNewDeletedGroup = () => {
         if (tempSelectableGroup && tempSelectableGroup.length > 0) {
             setData('selectable_group', tempSelectableGroup);
-        } else {
-            toast.error(`${t('need_at_least_1_group')}`, {
-                title: `${t('need_at_least_1_group')}`,
-                duration: 3000,
-                variant: 'variant3',
-            });
         }
         
         setTempSelectableGroup(null);
@@ -258,16 +281,30 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
     const confirm = () => {
         const selectedItems = getMealItem.flatMap(cat =>
             cat.product.filter(p => p.checked).map(p => ({
-                id: p.id,
+                id: Date.now() + Math.random(), // still unique for React key, if needed
+                product_id: p.id,
                 name: p.name,
                 item_code: p.item_code,
-                quantity: p.quantity || 1
+                quantity: p.quantity || 1,
+                product_image: p.product_image || '',
             }))
         );
-        
-        setData('fixed_item', selectedItems);
-        setIsAddItemOpen(false);
 
+        setData(prev => {
+            const existingProductIds = new Set((prev.fixed_item || []).map(item => item.product_id));
+
+            const merged = [
+                ...(prev.fixed_item || []),
+                ...selectedItems.filter(item => !existingProductIds.has(item.product_id))
+            ];
+
+            return {
+                ...prev,
+                fixed_item: merged
+            };
+        });
+
+        setIsAddItemOpen(false);
     };
 
     const displayedGroups = tempSelectableGroup ?? data.selectable_group ?? [];
@@ -296,8 +333,14 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                                     {
                                         data.fixed_item.map((selectedFixedItem, index) => (
                                             <div key={index} className="max-w-[120px] max-h-[120px] w-full h-[120px] bg-neutral-50 border border-neutral-100 rounded-lg flex items-center justify-center relative overflow-hidden">
+                                                {
+                                                    selectedFixedItem.product_image ? (
+                                                        <img src={selectedFixedItem.product_image} alt={selectedFixedItem.item_code} className="max-w-[100px] max-h-[100px] w-full h-[100px] object-cover rounded-lg" />
+                                                    ) : (
+                                                        <span className="font-bold">{selectedFixedItem.product?.item_code ? selectedFixedItem.product.item_code : selectedFixedItem.item_code}</span>
+                                                    )
+                                                }
                                                 
-                                                {selectedFixedItem.product?.item_code ? selectedFixedItem.product.item_code : selectedFixedItem.item_code}
 
                                                 <div className="absolute top-2 right-2 cursor-pointer" onClick={() => removeFromFixedItem(selectedFixedItem.id)} >
                                                     <XIcon4 />
@@ -434,6 +477,7 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                                                                                 {
                                                                                     group.group_option.map((opt, index) => (
                                                                                         <div key={index} className="p-1 w-[52px] h-[52px] flex items-center justify-center border border-neutral-100 bg-neutral-50 rounded-lg">
+                                                                                            {/* <span className="text-xss">{opt.item_code ? opt.item_code : opt.product?.item_code}</span> */}
                                                                                             {
                                                                                                 opt.product_image ? (
                                                                                                     <img src={opt.product_image} alt={opt.product_image} className="object-cover" />
@@ -441,7 +485,6 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                                                                                                     <span className="text-xss">{opt.item_code}</span>
                                                                                                 )
                                                                                             }
-                                                                                            
                                                                                         </div>
                                                                                     ))
                                                                                 }
@@ -454,8 +497,14 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                                                                                 {
                                                                                     group.set_meal_group_item.map((opt, index) => (
                                                                                         <div key={index} className="p-1 w-[52px] h-[52px] flex items-center justify-center border border-neutral-100 bg-neutral-50 rounded-lg">
-                                                                                            <span className="text-xss">{opt.product.item_code}</span>
-                                                                                            
+                                                                                            {/* <span className="text-xss">{opt.product.item_code}</span> */}
+                                                                                            {
+                                                                                                opt.product_image ? (
+                                                                                                    <img src={opt.product_image} alt={opt.product_image} className="object-cover" />
+                                                                                                ) : (
+                                                                                                    <span className="text-xss">{opt.product.item_code}</span>
+                                                                                                )
+                                                                                            }
                                                                                         </div>
                                                                                     ))
                                                                                 }
@@ -596,7 +645,6 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                 closeEditSelectableGroup={closeEditSelectableGroup}
             />
 
-            
         </>
     )
 }

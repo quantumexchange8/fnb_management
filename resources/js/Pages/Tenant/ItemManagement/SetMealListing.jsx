@@ -140,6 +140,10 @@ export default function SetMealListing() {
         setSearchFilter('');
     }
 
+    const editSetMeal = (meal) => {
+        window.location.href = `/items-management/edit-set-meal/${meal.set_code}`
+    }
+
     return (
         <TenantAuthenicatedLayout>
             <div className="flex flex-col w-full">
@@ -220,17 +224,25 @@ export default function SetMealListing() {
                                                                     : meal.visibility === 'display';
 
                                                         return (
-                                                            <div key={i} className="p-4 flex flex-col gap-4 rounded-xl bg-white border border-neutral-50 shadow-sec-voucher cursor-pointer">
+                                                            <div key={i} className="p-4 flex flex-col gap-4 rounded-xl bg-white border border-neutral-50 shadow-sec-voucher cursor-pointer" onClick={() => editSetMeal(meal)} >
                                                                 <div className='py-10 px-4 relative bg-neutral-50 rounded-xl'>
-                                                                    <img src='' alt="" className="max-w-[180px] h-[140px] " />
-                                                                    {meal.visibility === 'hidden' && (
-                                                                        <div className="absolute inset-0 z-10 bg-gradient-hidden rounded-xl flex flex-col items-center justify-center gap-3">
-                                                                            <div><HiddenIcon /></div>
-                                                                            <div className="text-primary-300 text-sm font-bold text-center">
-                                                                                This item has been hidden
+                                                                    {
+                                                                        meal.set_image ? (
+                                                                            <img src={meal.set_image} alt="" className="max-w-[180px] h-[140px] " />
+                                                                        ) : (
+                                                                            <div className="w-full h-[140px] flex justify-center items-center font-bold text-xs">{meal.set_code}</div>
+                                                                        )
+                                                                    }
+                                                                    {
+                                                                        meal.visibility === 'hidden' && (
+                                                                            <div className="absolute inset-0 z-10 bg-gradient-hidden rounded-xl flex flex-col items-center justify-center gap-3">
+                                                                                <div><HiddenIcon /></div>
+                                                                                <div className="text-primary-300 text-sm font-bold text-center">
+                                                                                    This item has been hidden
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                    )}
+                                                                        )
+                                                                    }
                                                                 </div>
                                                                 <div className="flex flex-col gap-3">
                                                                     <div className="text-neutral-800 text-base font-bold text-wrap h-[50px]">{meal.set_code} - {meal.set_name}</div>

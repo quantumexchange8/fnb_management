@@ -1,6 +1,6 @@
 import Button from "@/Components/Button";
 import ConfirmDialog from "@/Components/ConfirmDialog";
-import { DeleteIcon, EditIcon, ExportIcon, GripVerticalIcon, PlusIcon, SearchIcon } from "@/Components/Icon/Outline";
+import { DeleteIcon, EditIcon, ExportIcon, GripVerticalIcon, PlusIcon, SearchIcon, XIcon2 } from "@/Components/Icon/Outline";
 import InputLabel from "@/Components/InputLabel";
 import Modal from "@/Components/Modal";
 import TextInput from "@/Components/TextInput";
@@ -21,10 +21,11 @@ export default function CategoryList() {
     const [isLoading, setIsLoading] = useState(false);
     const [searchFilter, setSearchFilter] = useState('');
     const [getCategory, setGetCategory] = useState([]);
+    const [getFullCategory, setGetFullCategory] = useState([]);
     const [visibility, setVisibility] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(6); // default 6 per page
+    const [pageSize, setPageSize] = useState(10); // default 6 per page
     const [switchLoading, setswitchLoading] = useState(false);
     const [switchStates, setSwitchStates] = useState({}); // 用于存储 Switch 的状态
     const [updateQueue, setUpdateQueue] = useState({}); // 用于存储待更新的状态
@@ -43,6 +44,7 @@ export default function CategoryList() {
                 params: {
                     page: page,
                     per_page: pageSize,
+                    search: searchFilter,
                 }
             });
 
@@ -56,13 +58,32 @@ export default function CategoryList() {
         }
     }
 
-    useEffect(() => {
-        fetchCategories(page, pageSize);
-    }, [page, pageSize]);
+    const fetchSortCategories = async () => {
+        setIsLoading(true);
 
-    const filterData = getCategory.filter((category) =>
-        category.name.toLowerCase().includes(searchFilter.toLowerCase())
-    );
+        try {
+
+            const response = await axios.get('/items-management/getSortCategories');
+
+            setGetFullCategory(response.data);
+            
+        } catch (error) {
+            console.error('Error Fetching categories: ', error)
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchCategories(page, pageSize, searchFilter);
+    }, [page, pageSize, searchFilter]);
+
+    useEffect(() => {
+        if (isOrderCategoryOpen) {
+            fetchSortCategories();
+        }
+    }, [isOrderCategoryOpen]);
+
 
     const handleTableChange = (pagination) => {
         setPage(pagination.current);
@@ -192,6 +213,20 @@ export default function CategoryList() {
             }
         },
         {
+            title: 'Type',
+            key: 'type',
+            dataIndex: 'type',
+            width: 130,
+            render: (_, record) => {
+                return (
+                    <div>
+                        {record.type === 'single' && 'Meal'}
+                        {record.type === 'set' && 'Set Meal'}
+                    </div>
+                )
+            }
+        },
+        {
             title: 'No.of Product',
             key: 'no_of_product',
             dataIndex: 'no_of_product',
@@ -199,7 +234,7 @@ export default function CategoryList() {
             render: (_, record) => {
                 return (
                     <div>
-                        0
+                        {record.product.length}
                     </div>
                 )
             }
@@ -258,9 +293,12 @@ export default function CategoryList() {
         visibility: 'display',
         category_color: '',
         description: '',
-        category_sorting: [
-            
-        ],
+        category_sorting: getFullCategory
+            ? getFullCategory.map((cat, index) => ({
+                    ...cat,
+                    order_no: cat.order_no ?? index + 1,
+                }))
+        : [],
     });
 
     useEffect(() => {
@@ -276,6 +314,7 @@ export default function CategoryList() {
     useEffect(() => {
         const sorted = getCategory.map((cat, index) => ({
             id: cat.id,
+            name: cat.name,
             order_no: index + 1,
         }));
 
@@ -383,6 +422,21 @@ export default function CategoryList() {
         })
     }
 
+    const clearFilter = () => {
+        setSearchFilter('');
+    }
+
+    const handleSort = (order) => {
+        const newSorting = order.map((id, index) => {
+            const item = data.category_sorting.find(p => p.id === id);
+            return {
+                ...item,
+                order_no: index + 1,
+            };
+        });
+        setData('category_sorting', newSorting);
+    };
+
     return (
         <TenantAuthenicatedLayout>
             <div className="py-2 px-4 flex flex-col gap-4">
@@ -404,9 +458,17 @@ export default function CategoryList() {
                             !isSearching ? (
                                 <div
                                     className="p-3 w-11 h-11 rounded-full bg-white border border-neutral-200 flex justify-center items-center cursor-pointer transition-all duration-300 ease-in-out"
-                                    onClick={() => setIsSearching(true)}
+                                    onClick={() => {
+                                        if (searchFilter) {
+                                            clearFilter();
+                                        } else {
+                                            setIsSearching(true);
+                                        }
+                                    }}
                                 >
-                                    <SearchIcon />
+                                    {
+                                        searchFilter ? <XIcon2 /> : <SearchIcon />
+                                    }
                                 </div>
                             ) : (
                                 <TextInput 
@@ -431,7 +493,7 @@ export default function CategoryList() {
                             <div>
                                 <Tag color="#FDD3A6" className="rounded-full" >
                                     <span className="text-primary-500 font-bold text-xss">
-                                        {filterData.length > 0 ? filterData.length : 0} {t('categories')}
+                                        {total} {t('categories')}
                                     </span>
                                 </Tag>
                             </div>
@@ -450,7 +512,7 @@ export default function CategoryList() {
                         <Table 
                             rowKey="id"
                             columns={columns}
-                            dataSource={isLoading ? [] : filterData}
+                            dataSource={isLoading ? [] : getCategory}
                             loading={isLoading}
                             pagination={{ 
                                 current: page,
@@ -460,7 +522,7 @@ export default function CategoryList() {
                                 pageSizeOptions: ['10', '25', '50', '100'],
                                 defaultPageSize: 10, 
                                 showQuickJumper: false,
-                                total: filterData?.length,
+                                total: total,
                                 showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                             }}
                             onChange={handleTableChange}
@@ -541,22 +603,25 @@ export default function CategoryList() {
                 footer={
                     <div className="flex items-center justify-end gap-4 w-full p-4">
                         <Button variant="white" size="md" onClick={clolseMangeCategoryOrder}>Cancel</Button>
-                        <Button size="md" onClick={updateOrders} >Save Changes</Button>
+                        <Button size="md" onClick={updateOrders} disabled={isLoading} >Save Changes</Button>
                     </div>
                 }
             >
                 {
-                    (getCategory && getCategory.length > 0) && (
+                    (getFullCategory && getFullCategory.length > 0) && (
                         <div >
                             <ReactSortable
-                                list={getCategory}
-                                setList={(newState) => setGetCategory(newState)}
+                                list={data.category_sorting}
+                                setList={(newList) => {
+                                    handleSort(newList.map(item => item.id));
+                                }}
                                 animation={200}
                                 handle=".drag-handle"
                                 className="px-4 py-3 flex flex-col gap-3"
+                                clone={(item) => ({ ...item })}
                             >
                                 {
-                                    getCategory.map((category,index) => (
+                                    data.category_sorting.map((category,index) => (
                                         <div key={category.id} className="flex items-center gap-3">
                                             <div className="drag-handle p-3 cursor-move"><GripVerticalIcon /></div>
                                             <div className="text-neutral-900 font-semibold">

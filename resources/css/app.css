@@ -136,6 +136,18 @@ select:focus,
     border: 1px solid #FDD3A6;
 }
 
+.ant-tag.custom-tag-active {
+    color: #1E941C;
+    background: #E9FCD8;
+    border: 1px solid #A9F088;
+}
+
+.ant-tag.custom-tag-inative {
+    color: #52525B;
+    background: #F0F0F3;
+    border: 1px solid #D4D4D8;
+}
+
 /* Ant select */
 
 .custom-select .ant-select-selector {

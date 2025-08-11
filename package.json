@@ -24,6 +24,7 @@
         "@dnd-kit/modifiers": "^9.0.0",
         "@dnd-kit/sortable": "^10.0.0",
         "antd": "^5.26.6",
+        "dayjs": "^1.11.13",
         "framer-motion": "^12.23.12",
         "i18next": "^25.3.2",
         "i18next-browser-languagedetector": "^8.2.0",

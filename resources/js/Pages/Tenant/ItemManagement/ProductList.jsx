@@ -234,7 +234,14 @@ export default function ProductList() {
                                                             return (
                                                                 <div key={index} className="p-4 flex flex-col gap-4 rounded-xl bg-white border border-neutral-50 shadow-sec-voucher cursor-pointer" onClick={() => editProduct(product)} >
                                                                     <div className='py-10 px-4 relative bg-neutral-50 rounded-xl'>
-                                                                        <img src='' alt="" className="max-w-[180px] h-[140px] " />
+                                                                        {
+                                                                            product.product_image ? (
+                                                                                <img src={product.product_image} alt="" className="max-w-[180px] h-[140px] " />
+                                                                            ) : (
+                                                                                <div className="max-w-[180px] h-[140px] flex justify-center items-center font-bold text-xs">{product.item_code}</div>
+                                                                            )
+                                                                        }
+                                                                        
                                                                         {product.visibility === 'hidden' && (
                                                                             <div className="absolute inset-0 z-10 bg-gradient-hidden rounded-xl flex flex-col items-center justify-center gap-3">
                                                                                 <div><HiddenIcon /></div>
@@ -280,7 +287,7 @@ export default function ProductList() {
                             align="center"
                             onChange={(newPage) => {
                                 setPage(newPage); // update your state
-                                fetchProducts(selectedCategory, newPage); // refetch data
+                                // fetchProducts(selectedCategory, newPage); // refetch data
                             }}
                             showSizeChanger={false}
                             showTotal={(total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`}

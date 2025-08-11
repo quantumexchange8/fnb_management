@@ -79,6 +79,7 @@ Route::middleware('auth:tenant')->group(function () {
         Route::get('/edit-modifier-group/{id}', [ItemManagementController::class, 'editModifierGroup'])->name('items-management.edit-modifier-group');
         Route::get('/edit-product/{id}', [ItemManagementController::class, 'editProduct'])->name('items-management.edit-product');
         Route::get('/set-meal-listing', [ItemManagementController::class, 'setMealListing'])->name('items-management.set-meal-listing');
+        Route::get('/edit-set-meal/{uid}', [ItemManagementController::class, 'editSetMeal'])->name('items-management.edit-set-meal');
 
         Route::get('/getCategories', [ItemManagementController::class, 'getCategories'])->name('items-management.getCategories');
         Route::get('/getModifier', [ItemManagementController::class, 'getModifier'])->name('items-management.getModifier');
@@ -87,6 +88,7 @@ Route::middleware('auth:tenant')->group(function () {
         Route::get('/getModifierGroup', [ItemManagementController::class, 'getModifierGroup'])->name('items-management.getModifierGroup');
         Route::get('/getMealItem', [ItemManagementController::class, 'getMealItem'])->name('items-management.getMealItem');
         Route::get('/getSetMeal', [ItemManagementController::class, 'getSetMeal'])->name('items-management.getSetMeal');
+        Route::get('/getSortCategories', [ItemManagementController::class, 'getSortCategories'])->name('items-management.getSortCategories');
         
         Route::post('/store-category', [ItemManagementController::class, 'storeCategory'])->name('items-management.store-category');
         Route::post('/updateCategoryVisibility', [ItemManagementController::class, 'updateCategoryVisibility'])->name('items-management.updateCategoryVisibility');
@@ -107,6 +109,7 @@ Route::middleware('auth:tenant')->group(function () {
         Route::post('/validate-set-meals', [ItemManagementController::class, 'validateSetMeals'])->name('items-management.validate-set-meals');
         Route::post('/store-set-meals', [ItemManagementController::class, 'storeSetMeals'])->name('items-management.store-set-meals');
         Route::post('/updateMealVisibility', [ItemManagementController::class, 'updateMealVisibility'])->name('items-management.updateMealVisibility');
+        Route::post('/update-set-meals', [ItemManagementController::class, 'updateSetMeals'])->name('items-management.update-set-meals');
         
     });
 
@@ -117,6 +120,11 @@ Route::middleware('auth:tenant')->group(function () {
     */
     Route::prefix('members')->group(function () {
         Route::get('/member-listing', [MemberController::class, 'memberListing'])->name('members.member-listing');
+        Route::get('/edit-member/{uid}', [MemberController::class, 'editMember'])->name('members.edit-member');
+
+        Route::get('/getMembers', [MemberController::class, 'getMembers'])->name('members.getMembers');
+
+
     });
 });
     

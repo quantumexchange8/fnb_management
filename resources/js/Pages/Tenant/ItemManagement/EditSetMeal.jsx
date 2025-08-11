@@ -1,22 +1,21 @@
 import TenantAuthenicatedLayout from "@/Layouts/TenantAuthenicatedLayout";
-import React, { useState } from "react";
+import { useForm } from "@inertiajs/react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import GeneralDetails from "./PartialsCreateSet/GeneralDetails";
 import AddItemSet from "./PartialsCreateSet/AddItemSet";
 import AvailabilityInventory from "./PartialsCreateSet/AvailabilityInventory";
 import Button from "@/Components/Button";
 import { NextIcon, PreviousIcon } from "@/Components/Icon/Outline";
-import { useForm } from "@inertiajs/react";
-import toast from "react-hot-toast";
-import axios from "axios";
+import dayjs from 'dayjs';
+import EditSetItem from "./PartialsCreateSet/EditSetItem";
 
-export default function CreateSetMeal() {
+export default function EditSetMeal ({ setMeals }) {
 
     const { t, i18n } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(1);
     const [getErrors, setGetErrors] = useState([]);
-    const [enableDeleteOpen, setEnableDeleteOpen] = useState(false);
 
     const next = async () => {
 
@@ -48,6 +47,7 @@ export default function CreateSetMeal() {
     }
 
     const { data, setData, post, processing, errors, reset, isDirty } = useForm({
+        id: '',
         set_code: '',
         set_name: '',
         no_of_pax: '',
@@ -57,7 +57,9 @@ export default function CreateSetMeal() {
 
         // Add item to this set
         fixed_item: null,
+        deleted_fixed_item: null,
         selectable_group: null,
+        delete_selectable_group: null,
         price_setting: 'sum_item',
         base_price: 0.00,
 
@@ -72,11 +74,39 @@ export default function CreateSetMeal() {
         low_stock: '',
     });
 
+    useEffect(() => {
+        if (setMeals) {
+            setData({
+                id: setMeals.id,
+                set_code: setMeals.set_code,
+                set_name: setMeals.set_name,
+                no_of_pax: setMeals.no_of_pax,
+                category_id: setMeals.category_id,
+                set_image: setMeals.set_image,
+                description: setMeals.description,
+
+                fixed_item: setMeals.set_meal_item,
+                selectable_group: setMeals.set_meal_group,
+                price_setting: setMeals.price_setting,
+                base_price: setMeals.base_price,
+
+                branch: JSON.parse(setMeals.branch_id || '[]'),
+                available_day: setMeals.available_days,
+                specify_day: setMeals.specific_days,
+                available_time: setMeals.available_time,
+                specify_start_time: dayjs(setMeals.available_from, 'HH:mm:ss'),
+                specify_end_time: dayjs(setMeals.available_to, 'HH:mm:ss'),
+                stock_alert: setMeals.stock_alert,
+                low_stock: setMeals.low_stock_threshold,
+            })
+        }
+    }, [setMeals]);
+
     const submit = (e) => {
         e.preventDefault();
         setIsLoading(true);
 
-        post(route('items-management.store-set-meals'), {
+        post(route('items-management.update-set-meals'), {
             onSuccess: () => {
                 setIsLoading(false);
                 toast.success(`${t('set_meal_created_success')}`, {
@@ -100,8 +130,7 @@ export default function CreateSetMeal() {
                 <div className="py-2 px-4 flex flex-col gap-5 w-full min-h-screen">
                     {/* Header */}
                     <div className="w-full flex flex-col">
-                        <div className="text-neutral-900 text-xxl font-bold">{t('create_set_meal')}</div>
-                        <div className="text-neutral-500 text-sm font-medium">{t('create_perfect_meal_bundle')}</div>
+                        <div className="text-neutral-900 text-xxl font-bold">{t('edit_set_meal')}</div>
                     </div>
 
                     <div className="flex flex-col gap-5">
@@ -126,7 +155,7 @@ export default function CreateSetMeal() {
                                 <div className={`${step === 3 ? 'text-neutral-900' : 'text-neutral-200'}  text-base `}>{t('availability_&_inventory')}</div>
                             </div>
                         </div>
-                        
+
                         {/* content */}
                         {
                             step === 1 && (
@@ -135,7 +164,7 @@ export default function CreateSetMeal() {
                         }
                         {
                             step === 2 && (
-                                <AddItemSet data={data} setData={setData} errors={errors} getErrors={getErrors} enableDeleteOpen={enableDeleteOpen} setEnableDeleteOpen={setEnableDeleteOpen} />
+                                <EditSetItem data={data} setData={setData} errors={errors} getErrors={getErrors} />
                             )
                         }
                         {
@@ -167,7 +196,7 @@ export default function CreateSetMeal() {
                                         <PreviousIcon />
                                         <span>{t('previous')}</span>
                                     </Button>
-                                    <Button size="md" onClick={next} disabled={enableDeleteOpen} className="flex items-center gap-2">
+                                    <Button size="md" onClick={next} className="flex items-center gap-2">
                                         <span>{t('next')}</span>
                                         <NextIcon />
                                     </Button>

@@ -42,7 +42,7 @@ export default function ModifierGroupList() {
             setTotal(response.data.total);      // assuming response.data.total contains total count
             
         } catch (error) {
-            console.error('Error Fetching categories: ', error)
+            console.error('Error Fetching modifier: ', error)
         } finally {
             setIsLoading(false);
         }

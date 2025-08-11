@@ -14,6 +14,9 @@ export default function SelectableGroup({
     closeGroup,
     data,
     setData,
+    editSelectableItem,
+    isEditSelectableGrpOpen,
+    closeEditSelectableGroup,
 }) {
 
     const { t, i18n } = useTranslation();
@@ -34,6 +37,20 @@ export default function SelectableGroup({
         min_select: 0,
         max_select: 0,
     });
+
+    useEffect(() => {
+        if (editSelectableItem) {
+            setGroupData({
+                uid: editSelectableItem.uid,
+                group_name: editSelectableItem.group_name,
+                group_type: editSelectableItem.group_type,
+                group_option: editSelectableItem?.group_option ?? editSelectableItem?.set_meal_group_item,
+                group_selectable_type: editSelectableItem.group_selectable_type,
+                min_select: editSelectableItem.min_select ? editSelectableItem.min_select : 0,
+                max_select: editSelectableItem.max_select ? editSelectableItem.max_select : 0,
+            })
+        }
+    }, [editSelectableItem]);
 
     const fetchMealItem = async () => {
         setIsLoading(true);
@@ -91,6 +108,20 @@ export default function SelectableGroup({
         setSearchFilter('');
     }
 
+    const closeCreateGroup = () => {
+        setStep(1);
+        closeGroup();
+        setGroupData({
+            uid: Date.now(),
+            group_name: '',
+            group_type: 'single-select',
+            group_option: null,
+            group_selectable_type: 'unlimited',
+            min_select: 0,
+            max_select: 0,
+        })
+    }
+
     const collapseItems = getMealItem.map((category, index) => {
         const total = category.product.length;
         const checkedCount = category.product.filter(p => p.checked).length;
@@ -131,7 +162,7 @@ export default function SelectableGroup({
                                         <div key={pIndex} className="flex flex-col gap-2">
                                             <div className="flex items-center gap-4 border rounded-lg p-2">
                                                 <img
-                                                    src={product.image_url}
+                                                    src={product.product_image}
                                                     alt={product.name}
                                                     className="w-[52px] h-[52px] rounded object-cover"
                                                 />
@@ -288,7 +319,8 @@ export default function SelectableGroup({
                 item_code: p.item_code,
                 quantity: p.quantity || 1,
                 prices: p.prices ?? 0,
-                additional_charge: p.additional_charge ?? 0
+                additional_charge: p.additional_charge ?? 0,
+                product_image: p.product_image ?? null,
             }))
         );
 
@@ -325,7 +357,6 @@ export default function SelectableGroup({
         }));
     };
 
-
     const confirm = () => {
         setData('selectable_group', [...(data.selectable_group || []), groupData]);
         setStep(1);
@@ -334,27 +365,64 @@ export default function SelectableGroup({
             group_type: 'single-select',
             group_option: null,
         });
-        closeGroup(false);
+        closeCreateGroup(false);
     }
 
-    console.log('groupData.group_option', groupData.group_option)
+    const updateSelectedItem = () => {
+        const prevGroups = data.selectable_group || [];
+        const existingIndex = prevGroups.findIndex((g) => g.uid === groupData.uid);
+
+        let updatedGroups;
+        if (existingIndex !== -1) {
+            // Update existing
+            updatedGroups = [...prevGroups];
+            updatedGroups[existingIndex] = groupData;
+        } else {
+            // Add new
+            updatedGroups = [...prevGroups, groupData];
+        }
+
+        setData('selectable_group', updatedGroups);
+
+        setStep(1);
+        setGroupData({
+            uid: Date.now(),
+            group_name: '',
+            group_type: 'single-select',
+            group_option: null,
+            group_selectable_type: 'unlimited',
+            min_select: 0,
+            max_select: 0,
+        });
+        closeEditSelectableGroup();
+    };
 
     return (
         <>
             <Modal
                 show={isSelectableGrpOpen}
-                onClose={closeGroup}
+                onClose={closeCreateGroup}
                 title={t('create_group')}
                 maxWidth='lg'
                 maxHeight='lg'
                 footer={
                     <div className="w-full flex items-center justify-between gap-3 py-4 px-5">
-                        <Button variant="white" size="md" onClick={closeGroup}>
+                        <Button variant="white" size="md" onClick={closeCreateGroup}>
                             {t('cancel')}
                         </Button>
                         {
                             step === 1 && (
-                                <Button size="md" className="flex items-center gap-2" disabled={!groupData.group_name} onClick={nextStep} >
+                                <Button size="md" className="flex items-center gap-2" 
+                                    disabled={
+                                        !groupData.group_name ||
+                                        (
+                                        groupData.group_type === 'multi-select' &&
+                                        groupData.group_selectable_type === 'limited' &&
+                                        groupData.min_select === 0
+                                        )
+                                    }
+                                    onClick={nextStep} 
+                                >
                                     {t('next')}
                                     <NextIcon />
                                 </Button>
@@ -538,7 +606,14 @@ export default function SelectableGroup({
                                                             </div>
                                                             <div className="flex items-center gap-4 w-full">
                                                                 <div className="py-1 px-1.5 bg-neutral-50 rounded-lg border border-neutral-100 max-w-[52px] h-[52px] w-full flex items-center justify-center">
-                                                                    <span className="text-xss">{option.item_code}</span>
+                                                                    {/* <span className="text-xss">{option.item_code}</span> */}
+                                                                    {
+                                                                        option.product_image ? (
+                                                                            <img src={option.product_image} alt={option.product_image} className="object-cover" />
+                                                                        ) : (
+                                                                            <span className="text-xss">{option.item_code}</span>
+                                                                        )
+                                                                    }
                                                                 </div>
                                                                 <div className="flex flex-col gap-1 w-full">
                                                                     <div className="text-neutral-900 text-base font-bold">{option.item_code} {option.name}</div>
@@ -734,6 +809,102 @@ export default function SelectableGroup({
                                 >
                                     <PlusIcon className="text-neutral-900" />
                                 </Button>
+                            </div>
+                        </div>
+                    )
+                }
+            </Modal>
+
+            <Modal
+                show={isEditSelectableGrpOpen}
+                onClose={closeEditSelectableGroup}
+                title={t('edit_group')}
+                maxWidth='lg'
+                maxHeight='lg'
+                footer={
+                    <div className="w-full flex items-center justify-end gap-3 py-4 px-5">
+                        <Button variant="white" size="md" onClick={closeEditSelectableGroup}>
+                            {t('cancel')}
+                        </Button>
+                        <Button size="md" onClick={updateSelectedItem} >
+                            {t('confirm')}
+                        </Button>
+                    </div>
+                }
+            >
+                {
+                    editSelectableItem && (
+                        <div className="p-5 flex flex-col gap-7">
+                            <div className="flex flex-col gap-3">
+                                <div className="text-neutral-900 text-base font-bold">{t('group_name')}</div>
+                                <div>
+                                    <TextInput 
+                                        className='w-full'
+                                        value={groupData.group_name}
+                                        onChange={(e) =>
+                                            setGroupData((prev) => ({
+                                            ...prev,
+                                            group_name: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <div className="text-neutral-900 text-base font-bold">{t('group_type')}</div>
+                                <div className="py-2 flex flex-col gap-1">
+                                    <div className="text-neutral-900 text-sm font-bold">{groupData.group_type === 'single-select' ? t('single_select_only') : t('multi-select')}</div>
+                                    <div className="text-neutral-400 text-sm">{groupData.group_type === 'single-select' ? t('customer_can_choose_only_one_item_from_the_group') : t('customer_can_choose_more_than_one_item_from_the_group')}</div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <div className="text-neutral-900 text-base font-bold">{t('option_from_this_group')}</div>
+                                <div className="flex flex-col gap-4">
+                                    {
+                                        groupData.group_option?.length > 0 && (
+                                            <div className="flex flex-col gap-4 w-full">
+                                                {
+                                                    groupData.group_option.map((opt, i) => (
+                                                        <div key={i} className="p-4 flex items-center gap-4 w-full border border-neutral-100 rounded-xl">
+                                                            <div className="p-2 border border-neutral-200 rounded-xl shadow-input text-center">
+                                                                <div className="w-6 text-neutral-900 text-sm font-bold">{opt.quantity}x</div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4 w-full">
+                                                                <div className="py-1 px-1.5 bg-neutral-50 rounded-lg border border-neutral-100 max-w-[52px] h-[52px] w-full flex items-center justify-center">
+                                                                    {
+                                                                        opt.product_image ? (
+                                                                            <img src={opt.product_image} alt={opt.product_image} className="object-cover" />
+                                                                        ) : (
+                                                                            <span className="text-xss">{opt.item_code}</span>
+                                                                        )
+                                                                    }
+                                                                </div>
+                                                                <div className="flex flex-col gap-1 w-full">
+                                                                    <div className="text-neutral-900 text-base font-bold">{opt.item_code} {opt.name}</div>
+                                                                    <div>RM {opt.additional_charge ? Number(opt.additional_charge).toFixed(2) : '0.00'}</div>
+                                                                </div>
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="p-[9px] cursor-pointer hover:bg-neutral-25 rounded-lg" onClick={() => editOptionItem(opt)} >
+                                                                        <EditIcon />
+                                                                    </div>
+                                                                    <div className="p-[9px] cursor-pointer hover:bg-neutral-25 rounded-lg" onClick={() => removeFromOption(opt.id)} >
+                                                                        <DeleteIcon />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                                <div className="w-full" onClick={openAddOption}>
+                                                    <Button size="md" variant="secondary" className="flex justify-center items-center gap-2 w-full">
+                                                        <PlusIcon />
+                                                        <span>{t('add_another_option')}</span>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                </div>
                             </div>
                         </div>
                     )

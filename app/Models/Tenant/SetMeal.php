@@ -3,9 +3,14 @@
 namespace App\Models\Tenant;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class SetMeal extends Model
+class SetMeal extends Model implements HasMedia
 {
+
+    use InteractsWithMedia;
+
     protected $fillable = [
         'set_name',
         'set_code',

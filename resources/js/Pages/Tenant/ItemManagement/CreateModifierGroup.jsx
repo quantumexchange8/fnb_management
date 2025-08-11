@@ -461,7 +461,7 @@ export default function CreateModifierGroup() {
                                             className="flex items-center gap-4 border rounded-lg p-2"
                                         >
                                             <img
-                                                src={product.image_url}
+                                                src={product.product_image}
                                                 alt={product.name}
                                                 className="w-[52px] h-[52px] rounded object-cover"
                                             />
