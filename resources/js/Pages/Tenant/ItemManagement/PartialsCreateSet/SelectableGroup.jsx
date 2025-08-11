@@ -617,7 +617,7 @@ export default function SelectableGroup({
                                                                 </div>
                                                                 <div className="flex flex-col gap-1 w-full">
                                                                     <div className="text-neutral-900 text-base font-bold">{option.item_code} {option.name}</div>
-                                                                    <div>RM {option.additional_charge ? (option.additional_charge).toFixed(2) : 0}</div>
+                                                                    <div>RM {option.additional_charge ? Number(option.additional_charge).toFixed(2) : 0}</div>
                                                                 </div>
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="p-[9px] cursor-pointer hover:bg-neutral-25 rounded-lg" onClick={() => editOptionItem(option)} >
