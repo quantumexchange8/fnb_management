@@ -1,8 +1,10 @@
 import Button from "@/Components/Button";
 import { PlusIcon, UploadIcon } from "@/Components/Icon/Outline";
 import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import Modal from "@/Components/Modal";
 import TextInput from "@/Components/TextInput";
-import { InputNumber, Select, Upload } from "antd";
+import { ColorPicker, InputNumber, Radio, Select, Upload } from "antd";
 import { Editor } from "primereact/editor";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,13 +16,16 @@ export default function GeneralDetails({ data, setData, errors, getErrors }) {
     const [getCategory, setGetCategory] = useState([]);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [categoryType, setCategoryType] = useState('set');
 
     const fetchCategories = async () => {
         setIsLoading(true);
 
         try {
 
-            const response = await axios.get('/items-management/getCategories');
+            const response = await axios.get('/items-management/getCategories', {
+                params: {categoryType}
+            });
 
             setGetCategory(response.data.data);
             
@@ -85,6 +90,46 @@ export default function GeneralDetails({ data, setData, errors, getErrors }) {
     }
     
     const header = renderHeader();
+
+    const createCategory = () => {
+        const newId = Date.now(); // or generate uuid if needed
+        
+        const newCategory = {
+            id: newId,
+            name: data.category_name,
+            category_visibility: data.category_visibility,
+            color: data.category_color,  // Note: changed from category_color to color to match your options mapping
+            description: data.category_description,
+        };
+        
+        // Add the new category to getCategory state
+        setGetCategory([...getCategory, newCategory]);
+        
+        // Set the new_category data and select it
+        setData({
+            ...data,
+            new_category: [newCategory],
+            category_id: newId
+        });
+        
+        // Close the modal
+        closeAddCategory();
+    }
+
+    const presets = [
+        {
+            label: 'Recommended',
+            colors: ['#1677ff', '#ff4d4f', '#52c41a', '#faad14', '#722ed1', '#13c2c2'],
+        },
+        {
+            label: 'Pastel',
+            colors: ['#ff9aa2', '#ffb7b2', '#ffdac1', '#e2f0cb', '#b5ead7', '#c7ceea'],
+        },
+    ];
+
+    const handleColorChange = (color) => {
+        setData('category_color', color.toHexString());
+    };
 
     return (
         <div className="flex flex-col gap-4">
@@ -214,6 +259,74 @@ export default function GeneralDetails({ data, setData, errors, getErrors }) {
                     placeholder={t('enter_here_optional')}
                 />
             </div>
+
+            <Modal
+                show={isCategoryOpen}
+                onClose={closeAddCategory}
+                title={t('create_new_category')}
+                maxWidth='lg'
+                maxHeight='lg'
+                footer={
+                    <div className="w-full flex items-center justify-end gap-3 py-4 px-5">
+                        <Button variant="white" size="sm" onClick={closeAddCategory}>
+                            {t('cancel')}
+                        </Button>
+                        <Button size="sm" onClick={createCategory}>
+                            {t('create')}
+                        </Button>
+                    </div>
+                }
+            >
+                <div className="p-5 flex flex-col gap-6">
+                    <div className="w-full flex items-center gap-6">
+                        <div className="flex flex-col gap-3 w-full">
+                            <InputLabel value={t('category_name')} />
+                            <TextInput 
+                                type='text'
+                                value={data.category_name}
+                                className="w-full max-w-[328px]"
+                                onChange={(e) => setData('category_name', e.target.value)}
+                                placeholder={t('eg_enter_category_name')}
+                            />
+                            <InputError message={errors.category_name} />
+                        </div>
+                        <div className="flex flex-col gap-3 w-full">
+                            <InputLabel value={t('visibility')} />
+                            <Radio.Group 
+                                value={data.category_visibility}
+                                onChange={(e) => setData('category_visibility', e.target.value)}
+                                options={[
+                                    { label: t('display'), value: 'display' },
+                                    { label: t('hidden'), value: 'hidden' }
+                                ]}
+                            />
+                        </div>
+                    </div>
+                    <div className="w-full flex items-center gap-6">
+                        <div className="flex flex-col gap-3">
+                            <InputLabel value={t('category_colour')} />
+                            <div className="w-full">
+                                <ColorPicker 
+                                    presets={presets}
+                                    value={data.category_color || '#1677ff'}
+                                    onChange={handleColorChange}
+                                    className="rounded-full custom-color-picker"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-3 w-full">
+                        <InputLabel value={t('description')} />
+                        <Editor
+                            value={data.category_description} 
+                            onTextChange={(e) => setData('category_description', e.htmlValue)} 
+                            style={{ height: '280px', borderRadius: '0px 0px 8px 8px', border: '0px solid' }} 
+                            headerTemplate={header}
+                            placeholder={t('enter_here_optional')}
+                        />
+                    </div>
+                </div>
+            </Modal>
         </div>
     )
 }

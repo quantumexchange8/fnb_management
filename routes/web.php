@@ -6,6 +6,7 @@ use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\GlobalController;
 use App\Http\Controllers\Tenant\ItemManagementController;
 use App\Http\Controllers\Tenant\MemberController;
+use App\Http\Middleware\InitializeTenantFromSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -52,7 +53,7 @@ Route::middleware('auth:web')->group(function () {
  *     Tenant Routes
  * ==============================
 */
-Route::middleware('auth:tenant')->group(function () {
+Route::middleware([InitializeTenantFromSession::class, 'auth:tenant'])->group(function () {
     Route::get('/tenant/dashboard', [DashboardController::class, 'dashboard'])->name('tenant.dashboard');
 
     /**
@@ -112,7 +113,7 @@ Route::middleware('auth:tenant')->group(function () {
         Route::post('/update-set-meals', [ItemManagementController::class, 'updateSetMeals'])->name('items-management.update-set-meals');
         
     });
-
+  
     /**
      * ==============================
      *     Member Routes
@@ -124,7 +125,9 @@ Route::middleware('auth:tenant')->group(function () {
 
         Route::get('/getMembers', [MemberController::class, 'getMembers'])->name('members.getMembers');
 
-
+        Route::post('/updateMemberStatus', [MemberController::class, 'updateMemberStatus'])->name('member.updateMemberStatus');
+        Route::post('/updateMemberProfile', [MemberController::class, 'updateMemberProfile'])->name('member.updateMemberProfile');
+        
     });
 });
     

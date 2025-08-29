@@ -21,13 +21,16 @@ export default function CreateProduct() {
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState([]);
+    const [categoryType, setCategoryType] = useState('single');
 
     const fetchCategories = async () => {
         setIsLoading(true);
 
         try {
 
-            const response = await axios.get('/items-management/getCategories');
+            const response = await axios.get('/items-management/getCategories', {
+                params: {categoryType}
+            });
 
             setGetCategory(response.data.data);
             

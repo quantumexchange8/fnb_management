@@ -7,7 +7,7 @@ import Modal from './Modal';
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 // import { ConfirmLogoutIcon } from "@/Components/Icon/Brand";
 import Button from './Button';
-import { MenuIcon } from './Icon/Outline';
+import { LangIcon, LogoutIcon, MenuIcon } from './Icon/Outline';
 // import toast from 'react-hot-toast';
 
 export default function Navbar({ user, header, toggleSidebar }) {
@@ -34,6 +34,10 @@ export default function Navbar({ user, header, toggleSidebar }) {
         }
     }, [])
 
+    const logout = () => {
+        post(route('tenant.logout'));
+    }
+
     return (
         <nav className={`sticky top-0 z-20 ease-in duration-500 w-full md:shadow-navbar`}>
             <div className='flex items-center justify-between bg-neutral-25 p-4'>
@@ -47,6 +51,15 @@ export default function Navbar({ user, header, toggleSidebar }) {
                 </div>
 
                 <div className='flex items-center gap-6'>
+                    <div className='flex items-center gap-2'>
+                        <div className='bg-neutral-25 rounded-full hover:bg-neutral-50 p-2.5 cursor-pointer'>
+                            <LangIcon />
+                        </div>
+                        <div className='bg-neutral-25 rounded-full hover:bg-neutral-50 p-2.5 cursor-pointer' onClick={logout}>
+                            <LogoutIcon />
+                        </div>
+                    </div>
+                    
                     <div className='hidden md:flex items-center gap-3 cursor-pointer hover:bg-gray-25 rounded drop-shadow hover:drop-shadow-md' >
                         <div className='flex flex-col items-end'>
                             <div className='text-neutral-950 font-semibold text-sm leading-tight'>

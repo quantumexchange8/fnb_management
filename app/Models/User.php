@@ -3,6 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\Tenant\Ranking;
+use App\Models\Tenant\UserVoucher;
+use App\Models\Tenant\Wallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,12 +20,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'client_uuid',
-        'password',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -44,5 +43,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function rank(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Ranking::class, 'rank_id', 'id');
+    }
+
+    public function upline(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'upline_id', 'id');
+    }
+
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\hasMany
+    {
+        return $this->hasMany(Wallet::class, 'user_id', 'id');
+    }
+
+    public function voucher(): \Illuminate\Database\Eloquent\Relations\hasMany
+    {
+        return $this->hasMany(UserVoucher::class, 'user_id', 'id');
     }
 }

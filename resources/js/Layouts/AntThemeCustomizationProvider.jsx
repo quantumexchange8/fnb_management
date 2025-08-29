@@ -33,7 +33,7 @@ function AntThemeCustomizationProvider({ children }) {
                         hoverBorderColor: '#09090B',
                     },
                     InputNumber: {
-                        
+                        hoverBorderColor: '#09090B',
                     }
                 }
             }}

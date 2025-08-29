@@ -181,6 +181,11 @@ class ItemManagementController extends Controller
             $query->where('name', 'like', "%$search%");
         }
 
+        if ($request->has('categoryType')) {
+            $type = $request->get('categoryType');
+            $query->where('type', $type);
+        }
+
         $categories = $query->paginate($perPage);
 
         return response()->json([
@@ -927,6 +932,10 @@ class ItemManagementController extends Controller
                     'quantity' => $opt['quantity'],
                 ]);
             }
+        }
+
+        if ($request->hasFile('set_image')) {
+            $setMeal->addMedia($request->set_image)->toMediaCollection('set_image');
         }
 
         return redirect()->back();

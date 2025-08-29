@@ -51,9 +51,13 @@ export default function CreateSetMeal() {
         set_code: '',
         set_name: '',
         no_of_pax: '',
-        category_id: '',
+        category_id: null,
         set_image: null,
         description: '',
+        new_category: null,
+        category_color: '#1677ff',
+        category_visibility: 'display',
+        category_description: '',
 
         // Add item to this set
         fixed_item: null,
