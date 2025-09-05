@@ -6,6 +6,7 @@ use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\GlobalController;
 use App\Http\Controllers\Tenant\ItemManagementController;
 use App\Http\Controllers\Tenant\MemberController;
+use App\Http\Controllers\Tenant\TableLayoutController;
 use App\Http\Middleware\InitializeTenantFromSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
@@ -127,8 +128,25 @@ Route::middleware([InitializeTenantFromSession::class, 'auth:tenant'])->group(fu
 
         Route::post('/updateMemberStatus', [MemberController::class, 'updateMemberStatus'])->name('member.updateMemberStatus');
         Route::post('/updateMemberProfile', [MemberController::class, 'updateMemberProfile'])->name('member.updateMemberProfile');
+
+    });
+
+    /**
+     * ==============================
+     *     Configurations Routes
+     * ==============================
+    */
+    Route::prefix('configuration')->group(function () {
+        Route::get('/table-layout', [TableLayoutController::class, 'tableLayout'])->name('configuration.table-layout');
+        Route::get('/edit-table-layout', [TableLayoutController::class, 'editTableLayout'])->name('configuration.edit-table-layout');
+        Route::get('/getFloorPlans', [TableLayoutController::class, 'getFloorPlans'])->name('configuration.getFloorPlans');
+
+        Route::post('/update-manage-section', [TableLayoutController::class, 'updateManageSection'])->name('configuration.update-manage-section');
+        Route::post('/store-table-layout', [TableLayoutController::class, 'storeTableLayout'])->name('configuration.store-table-layout');
         
     });
+    
+
 });
     
 

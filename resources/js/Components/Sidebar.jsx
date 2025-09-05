@@ -5,7 +5,7 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 // import { EinbillLogo } from "@/Components/Icon/logo";
-import { ChevronDown, ChevronUp, ConfigurationIcon, CornerDownRight, DashboardIcon, HistoryIcon, LogoutIcon, MemberIcon, TableIcon, VoucherIcon, WalletIcon, XIcon, PointIcon, OrderIcon, CategoryIcon, ItemIcon, TransactionIcon, MenuIcon, FoodIcon} from "./Icon/Outline";
+import { ChevronDown, ChevronUp, ConfigurationIcon, CornerDownRight, DashboardIcon, HistoryIcon, LogoutIcon, MemberIcon, TableIcon, VoucherIcon, WalletIcon, XIcon, PointIcon, OrderIcon, CategoryIcon, ItemIcon, TransactionIcon, MenuIcon, FoodIcon, ConfigIcon} from "./Icon/Outline";
 import { useState } from "react";
 import { useEffect } from "react";
 import { LogoutImg } from "./Icon/Brand";
@@ -17,6 +17,7 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
     const { url } = usePage();
     const [walletExpand, setWalletExpand] = useState(false);
     const [foodExpand, setFoodExpand] = useState(false);
+    const [configExpand, setConfigExpand] = useState(false);
     const [voucherExpand, setVoucherExpand] = useState(false);
 
     const { datas, setData, post, processing, reset } = useForm({});
@@ -33,6 +34,10 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
         { name: "Manage Modifier Item", path: "/items-management/manage-modifier-item" },
     ];
 
+    const configRoutes = [
+        { name: "Table Layout", path: "/configuration/table-layout" },
+    ];
+
     const isActive = (paths) => paths.includes(url);
 
 
@@ -44,21 +49,17 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
 
     }
 
-    const walletDropDown = () => {
-        setWalletExpand(!walletExpand)
-    }
-
-    const voucherDropDown = () => {
-        setVoucherExpand(!voucherExpand)
-    }
-
     useEffect(() => {
         if (isActive(foodRoutes.map(r => r.path))) {
             setFoodExpand(true);
         }
+        if (isActive(configRoutes.map(r => r.path))) {
+            setConfigExpand(true);
+        }
     }, [url]);
 
     const toggleFood = () => setFoodExpand(!foodExpand);
+    const toogleConfig = () => setConfigExpand(!configExpand);
 
     return (
         <>
@@ -147,20 +148,20 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
                                     `}
                                 >
                                     {foodRoutes.map((routeItem) => (
-                                        <div
+                                        <Link
                                             key={routeItem.path}
+                                            href={route(routeItem.path.replace('/items-management/', 'items-management.'))}
                                             className="flex gap-3 items-center px-4 py-2 hover:bg-neutral-900 hover:text-white"
                                         >
                                             <div className="max-w-5 w-full h-5">{/* Optional icon */}</div>
-                                            <Link
-                                                href={route(routeItem.path.replace('/items-management/', 'items-management.'))}
+                                            <div
                                                 className={`${url === routeItem.path ? 'text-neutral-200 font-bold w-full' : 'text-white w-full'}`}
                                             >
                                                 <div className={`flex items-center gap-3 ${url === routeItem.path ? 'font-bold text-white' : ''}`}>
                                                     <div className="text-sm">{routeItem.name}</div>
                                                 </div>
-                                            </Link>
-                                        </div>
+                                            </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>
@@ -191,6 +192,58 @@ export default function SideBar({ user, showingNavigationDropdown, expanded, tog
                                 )
                             }  
                         </div>
+                    </div>
+                    <div className="w-full">
+                        {!expanded ? (
+                            <Link
+                                className={`${isActive(configRoutes.map(r => r.path)) ? 'text-primary-700 font-bold' : 'text-white'}`}
+                            >
+                                <div className={`w-full flex justify-center py-2 ${isActive(configRoutes.map(r => r.path)) ? 'bg-primary-500' : 'hover:bg-neutral-900 p-2'}`}>
+                                    <ConfigIcon className={isActive(configRoutes.map(r => r.path)) ? 'text-primary-100' : 'text-neutral-200'} />
+                                </div>
+                            </Link>
+                        ) : (
+                            <div className="flex flex-col">
+                                {/* Dropdown Header */}
+                                <div
+                                    onClick={toogleConfig}
+                                    className={`px-4 py-2 flex items-center justify-between gap-3 cursor-pointer rounded hover:drop-shadow-md
+                                        ${isActive(configRoutes.map(r => r.path)) ? 'bg-primary-500 text-white' : 'text-white hover:bg-neutral-900 hover:text-white'}
+                                    `}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <ConfigIcon className={isActive(configRoutes.map(r => r.path)) ? 'text-primary-100' : 'text-neutral-200'} />
+                                        <div className="text-sm">Configuration</div>
+                                    </div>
+                                    {configExpand ? <ChevronUp className="text-white" /> : <ChevronDown className="text-white" />}
+                                </div>
+
+                                {/* Dropdown Items */}
+                                <div
+                                    className={`overflow-hidden transition-all duration-400 ease-in-out flex flex-col gap-1
+                                        ${configExpand ? 'max-h-screen opacity-100 py-2 bg-[#27272a66]' : 'max-h-0 opacity-0'}
+                                        ${isActive(configRoutes.map(r => r.path)) ? "" : ""}
+                                    `}
+                                >
+                                    {configRoutes.map((routeItem) => (
+                                        <Link
+                                            key={routeItem.path}
+                                            href={route(routeItem.path.replace('/configuration/', 'configuration.'))}
+                                            className="flex gap-3 items-center px-4 py-2 hover:bg-neutral-900 hover:text-white"
+                                        >
+                                            <div className="max-w-5 w-full h-5">{/* Optional icon */}</div>
+                                            <div
+                                                className={`${url === routeItem.path ? 'text-neutral-200 font-bold w-full' : 'text-white w-full'}`}
+                                            >
+                                                <div className={`flex items-center gap-3 ${url === routeItem.path ? 'font-bold text-white' : ''}`}>
+                                                    <div className="text-sm">{routeItem.name}</div>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </nav>
             </aside>

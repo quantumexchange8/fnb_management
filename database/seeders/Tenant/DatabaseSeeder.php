@@ -19,6 +19,16 @@ class DatabaseSeeder extends Seeder
             RankSeeder::class,
             RunningNumber::class,
             CountrySeeder::class,
+            FloorSectionSeeder::class,
+        ]);
+
+        User::factory()->create([
+            'name' => 'Admin',
+            'uid' => 'AID0001',
+            'email' => 'admin@admin.com',
+            'password' => 'Qwert1234',
+            'role' => 'superadmin',
+            'phone' => '123456789'
         ]);
     }
 }

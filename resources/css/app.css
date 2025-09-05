@@ -161,3 +161,8 @@ select:focus,
   border-radius: 6px !important;
   box-shadow: 0 1px 1px 0 rgba(46, 46, 46, 0.09);
 }
+
+.custom-collapse .ant-collapse-content>.ant-collapse-content-box {
+  padding: 0;
+  padding-block: 0 !important;
+}

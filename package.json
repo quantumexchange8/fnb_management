@@ -34,6 +34,7 @@
         "react-countup": "^6.5.3",
         "react-hot-toast": "^2.5.2",
         "react-i18next": "^15.6.1",
+        "react-konva": "^18.2.12",
         "react-sortablejs": "^6.1.4",
         "sortablejs": "^1.15.6"
     }

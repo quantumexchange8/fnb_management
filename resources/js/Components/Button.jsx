@@ -50,7 +50,7 @@ export default ({
             variantClasses = `bg-transparent text-primary-500 hover:text-primary-500 hover:no-underline disabled:text-primary-200 disabled:bg-transparent disabled:no-underline`
             break
         default:
-            variantClasses = `bg-primary-500 text-white text-sm hover:bg-primary-600 hover:border hover:border-primary-600 hover:text-primary-100 disabled:text-primary-100 disabled:bg-primary-200 rounded-xl`
+            variantClasses = `bg-primary-500 text-white text-sm hover:bg-primary-600 hover:border hover:border-primary-600 hover:text-primary-100 disabled:text-primary-100 disabled:bg-primary-200`
     }
 
     const sizeClasses = `${
@@ -62,7 +62,7 @@ export default ({
     }`
 
     const roundedClasses = `${!squared && !pill ? 'rounded-xl' : ''} ${
-        pill ? 'rounded-full' : ''
+        pill ? 'rounded-full' : 'rounded-xl'
     }`
 
     const iconSizeClasses = `${size == 'sm' ? 'w-5 h-5' : ''} ${
