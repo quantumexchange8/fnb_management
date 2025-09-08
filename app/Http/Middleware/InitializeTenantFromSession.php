@@ -19,7 +19,8 @@ class InitializeTenantFromSession
     {
         if ($request->is('tenant/logout') || $request->is('logout')) {
             return $next($request);
-        } else {
+        } 
+        
             if (!tenancy()->initialized && $request->session()->has('tenant_id')) {
                 $tenantId = $request->session()->get('tenant_id');
                 $tenant = Tenant::find($tenantId);
@@ -28,11 +29,8 @@ class InitializeTenantFromSession
                     tenancy()->initialize($tenant);
                     // Auth::shouldUse('tenant');
                 }
-            } else {
-                Auth::shouldUse('web');
             }
             
             return $next($request);
-        }
     }
 }
