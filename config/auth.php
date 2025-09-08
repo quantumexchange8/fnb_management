@@ -43,7 +43,9 @@ return [
         'tenant' => [
             'driver' => 'session',
             'provider' => 'tenant_users',
-            'session_key' => 'login_tenant_',
+            'session_key' => function () {
+                return 'login_tenant_' . (tenancy()->tenant?->id ?? 'default');
+            },
         ],
     ],
 
