@@ -50,16 +50,43 @@ class TableLayoutController extends Controller
     public function updateManageSection(Request $request)
     {
 
+        $layout = [
+            ["x" => 480, "y" => 160, "pax" => 2, "color" => "#FCFCFC", "label" => "T01", "width" => 75, "height" => 75, "table_id" => "T01"],
+            ["x" => 200, "y" => 160, "pax" => 2, "color" => "#FCFCFC", "label" => "T02", "width" => 75, "height" => 75, "table_id" => "T02"],
+            ["x" => 200, "y" => 360, "pax" => 2, "color" => "#FCFCFC", "label" => "T03", "width" => 75, "height" => 75, "table_id" => "T03"],
+            ["x" => 480, "y" => 360, "pax" => 2, "color" => "#FCFCFC", "label" => "T04", "width" => 75, "height" => 75, "table_id" => "T04"],
+        ];
+
         if (!empty($request->removedFloor)) {
             foreach ($request->removedFloor as $remove) {
                 $existingFloor = TableLayout::find($remove);
 
                 if ($existingFloor) {
-                    $existingFloor->delete();
+
+                    $floorTables = FloorTable::where('table_layout_id', $existingFloor)->get();
+
+                    if (!empty($floorTables)) {
+                        $inUse = $floorTables->contains(function ($table) {
+                            return $table->status !== 'available' || $table->current_order_id !== null;
+                        });
+    
+                        if ($inUse) {
+                            return response()->json([
+                                'message' => 'Cannot delete floor, some tables are in use.'
+                            ], 409); // conflict
+                        } else {
+                            foreach ($floorTables as $table) {
+                                $table->delete();
+                            }
+
+                            $existingFloor->delete();
+                        }
+                    }
                 }
             }
         }
 
+        // Loop through submitted floors
         foreach ($request->floors as $floor) {
             $existingFloor = TableLayout::find($floor['id']);
 
@@ -69,10 +96,26 @@ class TableLayoutController extends Controller
                     'order_no' => $floor['order_no'],
                 ]);
             } else {
-                TableLayout::create([
+                $tableLayout = TableLayout::create([
                     'name' => $floor['name'],
                     'order_no' => $floor['order_no'],
+                    'layout_json' => json_encode($layout),
                 ]);
+
+                // Create default tables for this floor
+                foreach ($layout as $table) {
+                    FloorTable::create([
+                        'table_layout_id' => $tableLayout->id,
+                        'table_id' => $table['table_id'],
+                        'table_name' => $table['label'],
+                        'pax' => $table['pax'],
+                        'status' => 'available',
+                        'current_order_id' => null,
+                        'available_color' => $table['color'],
+                        'in_use_color' => $table['color'],
+                        'reserved_color' => $table['color'],
+                    ]);
+                }
             }
         }
 
@@ -104,7 +147,7 @@ class TableLayoutController extends Controller
 
         foreach ($request->shapes as $table) {
 
-            $findExistingTable = FloorTable::where('table_id', $table['table_id'])->first();
+            $findExistingTable = FloorTable::where('table_layout_id', $findExistingFloor->id)->where('table_id', $table['table_id'])->first();
 
             if ($findExistingTable) {
                 $findExistingTable->update([

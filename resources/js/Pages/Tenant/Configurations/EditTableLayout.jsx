@@ -266,7 +266,13 @@ export default function EditTableLayout({ floors }) {
                 removedTable: removedTable
             })
 
-            setRemovedTable([])
+            setRemovedTable([]);
+
+            toast.success(`${t('floor_map_saved.')}`, {
+                title: `${t('floor_map_saved.')}`,
+                duration: 3000,
+                variant: 'variant3',
+            });
 
         } catch (error) {
             console.error('error', error);
@@ -288,19 +294,19 @@ export default function EditTableLayout({ floors }) {
                 <div className="flex flex-col gap-2 py-5 px-4">
                     <div className="text-neutral-900 text-base font-bold">Table Status Colour</div>
                     <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-3">
-                        <ColorPicker value={availableColor} onChange={handleAvailableColorChange} >
+                        <ColorPicker placement="bottom" value={availableColor} onChange={handleAvailableColorChange} >
                             <div className="w-full p-3 flex flex-col items-center gap-3 border border-neutral-50 bg-white rounded-xl" >
                                 <div className="w-8 h-8 rounded-full border border-neutral-50" style={{ backgroundColor: availableColor }}></div>
                                 <div className="text-neutral-500 text-xs font-medium">Available</div>
                             </div>
                         </ColorPicker>
-                        <ColorPicker value={inUseColor} onChange={handleInUseColorChange} >
+                        <ColorPicker placement="bottom" value={inUseColor} onChange={handleInUseColorChange} >
                             <div className="w-full p-3 flex flex-col items-center gap-3 border border-neutral-50 bg-white rounded-xl">
                                 <div className="w-8 h-8 rounded-full border border-neutral-50" style={{ backgroundColor: inUseColor }}></div>
                                 <div className="text-neutral-500 text-xs font-medium text-nowrap">In Use</div>
                             </div>
                         </ColorPicker>
-                        <ColorPicker value={reservedColor} onChange={handleReservedColorChange} >
+                        <ColorPicker placement="bottomRight" value={reservedColor} onChange={handleReservedColorChange} >
                             <div className="w-full p-3 flex flex-col items-center gap-3 border border-neutral-50 bg-white rounded-xl" >
                                 <div className="w-8 h-8 rounded-full border border-neutral-50" style={{ backgroundColor: reservedColor }}></div>
                                 <div className="text-neutral-500 text-xs font-medium">Reserved</div>
@@ -367,7 +373,7 @@ export default function EditTableLayout({ floors }) {
                         </div>
                         <div className="flex flex-col gap-1">
                             <div className="text-neutral-500 text-xs font-medium">Max. Seats</div>
-                            <div className="flex flex-col lg:grid grid-cols-6 gap-2">
+                            <div className="flex flex-col lg:flex-row gap-2">
                                 <Button 
                                     variant="textOnly"
                                     className={`py-3 px-4 rounded-xl border border-neutral-100 hover:bg-neutral-25 bg-white shadow-button box-border flex justify-center h-11 w-full lg:w-11 `}
@@ -378,7 +384,7 @@ export default function EditTableLayout({ floors }) {
                                 </Button>
                                 <div className="col-span-4">
                                     <TextInput 
-                                        className="border border-neutral-100 rounded-xl bg-white shadow-input w-full text-center"
+                                        className="border border-neutral-100 rounded-xl text-center bg-white shadow-input w-full "
                                         readOnly
                                         value={paxInput}
                                         type="number"
@@ -461,7 +467,6 @@ export default function EditTableLayout({ floors }) {
                     duration: 3000,
                     variant: 'variant3',
                 });
-                
             }
 
         } catch (error) {
@@ -486,7 +491,10 @@ export default function EditTableLayout({ floors }) {
                 order_no: idx + 1 
             }));
         setData('floors', newSection);
-        setData('removedFloor', [id]);
+        setData('removedFloor', [
+            ...(data.removedFloor || []), 
+            id
+        ]);
     }; 
     const handleEdit = (index) => {
         setIsEditingIndex(index);
@@ -709,7 +717,9 @@ export default function EditTableLayout({ floors }) {
                                                                     shape.type === 'circle' ? (
                                                                         <Circle
                                                                             radius={shape.radius}
-                                                                            fill={selectedIds.includes(shape.table_id) ? "#FFF" : shape.color}
+                                                                            fill={mergeMode? (selectedIds.includes(shape.table_id) ? "#FFF" : shape.color)
+                                                                                    : (selectedId === shape.table_id ? "#FFF" : shape.color)
+                                                                            }
                                                                             stroke={
                                                                                 mergeMode ? (selectedIds.includes(shape.table_id) ? "#F26522" : "#E4E4E7")
                                                                                     : (selectedId === shape.table_id ? "#F26522" : "#E4E4E7")
@@ -720,7 +730,9 @@ export default function EditTableLayout({ floors }) {
                                                                         <Rect
                                                                             width={shape.width}
                                                                             height={shape.height}
-                                                                            fill={selectedIds.includes(shape.table_id) ? "#FFF" : shape.color}
+                                                                            fill={mergeMode? (selectedIds.includes(shape.table_id) ? "#FFF" : shape.color)
+                                                                                    : (selectedId === shape.table_id ? "#FFF" : shape.color)
+                                                                            }
                                                                             stroke={
                                                                                 mergeMode? (selectedIds.includes(shape.table_id) ? "#F26522" : "#E4E4E7")
                                                                                     : (selectedId === shape.table_id ? "#F26522" : "#E4E4E7")
@@ -779,17 +791,16 @@ export default function EditTableLayout({ floors }) {
                     )
                 }
                 <div className="w-1/4 flex flex-col gap-3 ">
-                
                     <div className="flex flex-col border border-neutral-50 bg-white shadow-sec-voucher rounded-lg">
                         <Collapse ghost items={addBg} className="custom-collapse" expandIconPosition='end' />
                     </div>
 
                     <div className="flex flex-col border border-neutral-50 bg-white shadow-sec-voucher rounded-lg">
-                        <Collapse ghost items={addTable} className="custom-collapse" expandIconPosition='end' />
+                        <Collapse ghost items={addTable} defaultActiveKey={['1']} className="custom-collapse" expandIconPosition='end' />
                     </div>
 
                     <div className="flex flex-col border border-neutral-50 bg-white shadow-sec-voucher rounded-lg">
-                        <Collapse ghost items={tableDetails} className="custom-collapse" expandIconPosition='end' />
+                        <Collapse ghost items={tableDetails} defaultActiveKey={['1']} className="custom-collapse" expandIconPosition='end' />
                     </div>
                 </div>
             </div>
