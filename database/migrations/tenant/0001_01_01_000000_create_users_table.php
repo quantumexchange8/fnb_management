@@ -19,12 +19,12 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('verify')->nullable();
             $table->string('password');
-            $table->string('role');
+            $table->string('role')->default('member');
             $table->string('role_id')->nullable();
             $table->string('member_id')->nullable();
-            $table->string('dial_code');
-            $table->string('phone');
-            $table->string('dob');
+            $table->string('dial_code')->default('+60');
+            $table->string('phone')->nullable();
+            $table->string('dob')->nullable();
             $table->string('gender')->nullable();
             $table->string('referral_code')->nullable();
             $table->string('hierarchyList')->nullable();

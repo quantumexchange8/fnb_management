@@ -73,7 +73,7 @@ class LoginRequest extends FormRequest
         session([
             'auth_guard'   => 'tenant',
             'tenant_id'    => $tenant->id,
-            'tenant_uuid'  => $tenant->id,
+            'tenant_uuid'  => $tenant->getTenantKey(),
         ]);
 
         RateLimiter::clear($this->throttleKey());
