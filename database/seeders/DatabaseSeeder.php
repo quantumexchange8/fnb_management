@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             'client_uuid' => 'super-admin',
             'email' => 'admin@admin.com',
             'password' => 'Test1234.',
+            'pin' => '0000',
         ]);
     }
 }

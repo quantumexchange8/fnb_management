@@ -172,8 +172,6 @@ class ItemManagementController extends Controller
     public function getCategories(Request $request)
     {
 
-        $perPage = $request->get('per_page', 10);
-
         $query = Category::where('status', 'active')->with(['product'])->orderBy('order_no');
 
         if ($request->has('search')) {
@@ -186,14 +184,23 @@ class ItemManagementController extends Controller
             $query->where('type', $type);
         }
 
-        $categories = $query->paginate($perPage);
+        if ($request->has('per_page')) {
+            $perPage = $request->get('per_page', 10);
+            $categories = $query->paginate($perPage);
 
-        return response()->json([
-            'data' => $categories->items(),
-            'total' => $categories->total(),
-            'current_page' => $categories->currentPage(),
-            'last_page' => $categories->lastPage(),
-        ]);
+            return response()->json([
+                'data' => $categories->items(),
+                'total' => $categories->total(),
+                'current_page' => $categories->currentPage(),
+                'last_page' => $categories->lastPage(),
+            ]);
+        } else {
+            $categories = $query->get();
+
+            return response()->json([
+                'data' => $categories,
+            ]);
+        }
     }
     public function getSortCategories()
     {
@@ -396,8 +403,6 @@ class ItemManagementController extends Controller
     public function storeProduct(Request $request)
     {
 
-        // dd($request->all());
-
         $request->validate([
             'item_code' => 'required|string|max:255|unique:products',
             'name' => 'required|string|max:255',
@@ -412,16 +417,21 @@ class ItemManagementController extends Controller
         ]);
 
         $findCategory = Category::find($request->category_id);
+        // category latest order_no
+        $orderNo = Category::latest()->first();
+        $latestOrderNo = $orderNo->order_no;
 
         if (!$findCategory) {
 
             foreach ($request->new_category as $category) {
-                Category::create([
+                $findCategory = Category::create([
                     'name' => $category['name'],
                     'visibility' => $category['category_visibility'],
                     'color' => $category['color'],
                     'description' => $category['description'],
                     'status' => 'active',
+                    'type' => 'single',
+                    'order_no' => $latestOrderNo + 1,
                 ]);
             }
         }
@@ -873,13 +883,34 @@ class ItemManagementController extends Controller
             'specify_end_time' => 'required_if:available_time,specific-time',
             'stock_alert' => 'required',
             'low_stock' => 'required_if:stock_alert,enable',
+            'category_id' => 'required',
         ]);
+
+        $findCategory = Category::find($request->category_id);
+
+        $orderNo = Category::latest()->first();
+        $latestOrderNo = $orderNo->order_no;
+
+        if (!$findCategory) {
+
+            foreach ($request->new_category as $category) {
+                $findCategory = Category::create([
+                    'name' => $category['name'],
+                    'visibility' => $category['category_visibility'],
+                    'color' => $category['color'],
+                    'description' => $category['description'],
+                    'status' => 'active',
+                    'type' => 'set',
+                    'order_no' => $latestOrderNo + 1,
+                ]);
+            }
+        }
 
         $setMeal = SetMeal::create([
             'set_name' => $request->set_name,
             'set_code' => $request->set_code,
             'no_of_pax' => $request->no_of_pax,
-            'category_id' => $request->category_id,
+            'category_id' => $findCategory->id,
             'visibility' => 'display',
             'description' => $request->description ?? null,
             'price_setting' => $request->price_setting,

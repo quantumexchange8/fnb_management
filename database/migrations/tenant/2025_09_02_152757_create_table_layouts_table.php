@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('floor')->default('1');
             $table->string('table_id')->nullable();
             $table->string('order_no')->nullable();
+            $table->string('available_color')->default('#fcfcfc');
+            $table->string('in_use_color')->default('#fcfcfc');
+            $table->string('reserved_color')->default('#fcfcfc');
             $table->softDeletes();
             $table->timestamps();
         });

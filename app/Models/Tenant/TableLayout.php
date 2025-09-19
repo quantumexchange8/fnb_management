@@ -15,5 +15,8 @@ class TableLayout extends Model
         'layout_json',
         'floor',
         'table_id',
+        'available_color',
+        'in_use_color',
+        'reserved_color',
     ];
 }

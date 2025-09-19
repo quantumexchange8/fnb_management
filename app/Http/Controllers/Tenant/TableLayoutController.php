@@ -100,6 +100,9 @@ class TableLayoutController extends Controller
                     'name' => $floor['name'],
                     'order_no' => $floor['order_no'],
                     'layout_json' => json_encode($layout),
+                    'available_color' => '#fcfcfc',
+                    'in_use_color' => '#fcfcfc',
+                    'reserved_color' => '#fcfcfc',
                 ]);
 
                 // Create default tables for this floor
@@ -129,11 +132,29 @@ class TableLayoutController extends Controller
 
         // dd($request->all());
 
+        $request->validate([
+            'shapes' => ['required'],
+        ]);
+
         $findExistingFloor = TableLayout::find($request->floor);
 
         if ($findExistingFloor) {
+
+            $available_color = '#fcfcfc';
+            $in_use_color = '#fcfcfc';
+            $reserved_color = '#fcfcfc';
+
+            foreach ($request->shapes as $table) {
+                $available_color = $table['color'];
+                $in_use_color = $table['secondary_color'];
+                $reserved_color = $table['tertiary_color'];
+            }
+
             $findExistingFloor->update([
                 'layout_json' => json_encode($request->shapes),
+                'available_color' => $available_color,
+                'in_use_color' => $in_use_color,
+                'reserved_color' => $reserved_color,
             ]);
         }
 

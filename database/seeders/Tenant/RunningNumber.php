@@ -26,5 +26,33 @@ class RunningNumber extends Seeder
             'digits' => '8',
             'last_number' => '0',
         ]);
+
+        DB::table('running_numbers')->insert([
+            'type' => 'shift',
+            'prefix' => 'S',
+            'digits' => '8',
+            'last_number' => '0',
+        ]);
+
+        DB::table('running_numbers')->insert([
+            'type' => 'modifier_group',
+            'prefix' => 'MG',
+            'digits' => '4',
+            'last_number' => '0',
+        ]);
+
+        DB::table('running_numbers')->insert([
+            'type' => 'member_uid',
+            'prefix' => 'N2UM',
+            'digits' => '8',
+            'last_number' => '0',
+        ]);
+
+        DB::table('running_numbers')->insert([
+            'type' => 'order_no',
+            'prefix' => '#',
+            'digits' => '10',
+            'last_number' => '0',
+        ]);
     }
 }

@@ -39,6 +39,7 @@ return new class extends Migration
             $table->string('zip')->nullable();
             $table->string('status')->default(0);
             $table->string('branch')->nullable();
+            $table->string('pin')->nullable();
             $table->string('remark')->nullable();
             $table->softDeletes();
             $table->rememberToken();

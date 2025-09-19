@@ -17,12 +17,14 @@ class RankSeeder extends Seeder
         DB::table('rankings')->insert([
             'name' => 'normal',
             'min_amount' => '0.00',
+            'color' => '#F26522',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('rankings')->insert([
             'name' => 'VIP',
             'min_amount' => '0.00',
+            'color' => '#8b5cf6',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

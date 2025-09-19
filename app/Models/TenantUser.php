@@ -45,6 +45,7 @@ class TenantUser extends Authenticatable
         'remark',
         'joined_date',
         'expired_date',
+        'pin',
     ];
     protected $hidden = ['password', 'remember_token'];
 }

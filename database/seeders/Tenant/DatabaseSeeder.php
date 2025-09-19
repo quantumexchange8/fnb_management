@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             RunningNumber::class,
             CountrySeeder::class,
             FloorSectionSeeder::class,
+            TaxSeeder::class,
         ]);
 
         User::factory()->create([
@@ -28,7 +29,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => 'Qwert1234',
             'role' => 'superadmin',
-            'phone' => '123456789'
+            'phone' => '123456789',
+            'pin' => '0000',
         ]);
     }
 }

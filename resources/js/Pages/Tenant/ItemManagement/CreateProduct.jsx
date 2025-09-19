@@ -169,6 +169,11 @@ export default function CreateProduct() {
             },
             onError: () => {
                 setIsLoading(false);
+                toast.error(`${t('fill_all_field')}`, {
+                    title: `${t('fill_all_field')}`,
+                    duration: 3000,
+                    variant: 'variant3',
+                });
             }
         })
     }

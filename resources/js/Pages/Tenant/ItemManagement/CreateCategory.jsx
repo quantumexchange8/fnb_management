@@ -17,7 +17,7 @@ export default function CreateCategory() {
         type: '',
         name: '',
         visibility: 'display',
-        category_color: '',
+        category_color: '#1677ff',
         description: '',
     });
 
@@ -96,6 +96,14 @@ export default function CreateCategory() {
                     variant: 'variant3',
                 });
                 reset();
+            },
+            onError: () => {
+                setIsLoading(false);
+                toast.error(`${t('fill_all_field')}`, {
+                    title: `${t('fill_all_field')}`,
+                    duration: 3000,
+                    variant: 'variant3',
+                });
             }
         })
     }

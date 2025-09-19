@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id');
             $table->decimal('prices', 13, 2)->default(0.00);
             $table->decimal('cost', 13, 2)->nullable();
+            $table->decimal('tax', 13, 2)->default(0.00);
             $table->decimal('reward_point', 13, 2)->nullable()->default(0.00);
             $table->enum('visibility', ['display', 'hidden']);
             $table->longText('description')->nullable();
