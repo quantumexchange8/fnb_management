@@ -84,6 +84,7 @@ Route::middleware([InitializeTenantFromSession::class, 'auth:tenant'])->group(fu
         Route::get('/edit-set-meal/{uid}', [ItemManagementController::class, 'editSetMeal'])->name('items-management.edit-set-meal');
 
         Route::get('/getCategories', [ItemManagementController::class, 'getCategories'])->name('items-management.getCategories');
+        Route::get('/getLinkCategoryProduct', [ItemManagementController::class, 'getLinkCategoryProduct'])->name('items-management.getLinkCategoryProduct');
         Route::get('/getModifier', [ItemManagementController::class, 'getModifier'])->name('items-management.getModifier');
         Route::get('/getProducts', [ItemManagementController::class, 'getProducts'])->name('items-management.getProducts');
         Route::get('/getModifierItem', [ItemManagementController::class, 'getModifierItem'])->name('items-management.getModifierItem');

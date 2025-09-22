@@ -8,7 +8,7 @@ import { Checkbox, Collapse, InputNumber, Radio, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function SelectableGroup({ 
+export default function EditSelectableGroup({ 
     isSelectableGrpOpen,
     setIsSelectableGrpOpen,
     closeGroup,
@@ -41,7 +41,7 @@ export default function SelectableGroup({
     useEffect(() => {
         if (editSelectableItem) {
             setGroupData({
-                uid: editSelectableItem.uid,
+                uid: editSelectableItem.id,
                 group_name: editSelectableItem.group_name,
                 group_type: editSelectableItem.group_type,
                 group_option: editSelectableItem?.group_option ?? editSelectableItem?.set_meal_group_item,
@@ -314,6 +314,7 @@ export default function SelectableGroup({
     const addOption = () => {
         const selectedItems = getMealItem.flatMap(cat =>
             cat.product.filter(p => p.checked).map(p => ({
+                uid: Date.now(),
                 id: p.id,
                 name: p.name,
                 item_code: p.item_code,
@@ -370,8 +371,9 @@ export default function SelectableGroup({
     }
 
     const updateSelectedItem = () => {
+        
         const prevGroups = data.selectable_group || [];
-        const existingIndex = prevGroups.findIndex((g) => g.uid === groupData.uid);
+        const existingIndex = prevGroups.findIndex((g) => g.id === groupData.id || g.id === groupData.uid);
 
         let updatedGroups;
         if (existingIndex !== -1) {

@@ -179,11 +179,6 @@ class ItemManagementController extends Controller
             $query->where('name', 'like', "%$search%");
         }
 
-        if ($request->has('categoryType')) {
-            $type = $request->get('categoryType');
-            $query->where('type', $type);
-        }
-
         if ($request->has('per_page')) {
             $perPage = $request->get('per_page', 10);
             $categories = $query->paginate($perPage);
@@ -201,6 +196,19 @@ class ItemManagementController extends Controller
                 'data' => $categories,
             ]);
         }
+    }
+    public function getLinkCategoryProduct(Request $request)
+    {
+
+        $query = Product::where('status', 'active');
+
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $products = $query->get();
+
+        return response()->json($products);
     }
     public function getSortCategories()
     {
@@ -325,19 +333,20 @@ class ItemManagementController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required',
             'visibility' => 'required|string',
             'description' => 'nullable|string',
             'category_color' => 'required|string|max:7', // Assuming color is a hex code
         ]);
 
+        $orderNo = Category::latest()->first();
         $category = Category::create([
             'name' => $request->name,
-            'type' => $request->type,
+            'type' => 'single',
             'visibility' => $request->visibility,
             'color' => $request->category_color,
             'description' => $request->description ?? null,
             'status' => 'active',
+            'order_no' => $orderNo ? $orderNo->order_no + 1 : 1,
         ]);
 
         return redirect()->back();
@@ -395,7 +404,15 @@ class ItemManagementController extends Controller
 
         $findCategory = Category::find($request->id);
 
-        $findCategory->delete();
+        // check category is using in product
+        $prodUnderCategory = Product::where('category_id', $findCategory->id)->get();
+
+        if (!empty($prodUnderCategory)) {
+            return redirect()->back()->withErrors(['Errors' => 'Category is in use']);
+        }
+
+        $findCategory->status = 'inactive';
+        $findCategory->save();
 
         return redirect()->back();
     }
@@ -513,7 +530,7 @@ class ItemManagementController extends Controller
             'display_name' => 'required|string|max:255',
             'min_value' => 'required',
             'max_value' => 'required',
-            'overide' => 'required',
+            // 'overide' => 'required',
             'modifier_item' => 'required|array|min:1',
             // 'meal_items' => 'required|array|min:1',
             'modifier_item.*.modifier_name' => 'required|string|max:255',
@@ -527,7 +544,7 @@ class ItemManagementController extends Controller
             'group_type' => $request->group_type,
             'min_selection' => $request->min_value,
             'max_selection' => $request->max_value,
-            'overide' => $request->overide,
+            // 'overide' => $request->overide,
             'status' => 'active',
         ]);
 
@@ -985,7 +1002,6 @@ class ItemManagementController extends Controller
 
     public function updateSetMeals(Request $request)
     {
-
         $request->validate([
             'branch' => 'required|array|min:1',
             'available_day' => 'required',
@@ -993,8 +1009,8 @@ class ItemManagementController extends Controller
             'specify_day' => 'required_if:available_day,specific-day',
             'specify_start_time' => 'required_if:available_time,specific-time',
             'specify_end_time' => 'required_if:available_time,specific-time',
-            'stock_alert' => 'required',
-            'low_stock' => 'required_if:stock_alert,enable',
+            // 'stock_alert' => 'required',
+            // 'low_stock' => 'required_if:stock_alert,enable',
         ]);
 
         $setMeal = SetMeal::find($request->id);
@@ -1018,18 +1034,20 @@ class ItemManagementController extends Controller
             'available_to' => Carbon::parse($request->specify_end_time)
                                 ->setTimezone('Asia/Kuala_Lumpur')
                                 ->format('H:i:s'),
-            'stock_alert' => $request->stock_alert,
-            'low_stock_threshold' => $request->low_stock ?? 0,
+            // 'stock_alert' => $request->stock_alert,
+            // 'low_stock_threshold' => $request->low_stock ?? 0,
             'status' => 'active',
         ]);
 
         // remove deleted fixed item
-        foreach ($request->deleted_fixed_item as $dfItem) {
-            
-            $deleteFixedItem = SetMealItem::find($dfItem);
-
-            if ($deleteFixedItem) {
-                $deleteFixedItem->delete();
+        if ($request->deleted_fixed_item && !empty($request->deleted_fixed_item)) {
+            foreach ($request->deleted_fixed_item as $dfItem) {
+                
+                $deleteFixedItem = SetMealItem::find($dfItem);
+    
+                if ($deleteFixedItem) {
+                    $deleteFixedItem->delete();
+                }
             }
         }
 
@@ -1057,9 +1075,27 @@ class ItemManagementController extends Controller
             }
         }
 
-        foreach ($request->selectable_group as $group) {
+        // remove delete selectable group
+        if (!empty($request->delete_group)) {
+            foreach ($request->delete_group as $delGroup) {
+                $deleteGroup = SetMealGroup::find($delGroup);
 
-            $selectedGroup = SetMealGroup::find($group['id']);
+                if ($deleteGroup) {
+                    // delete group item first
+                    $groupItems = SetMealGroupItem::where('set_meal_group_id', $deleteGroup->id)->get();
+                    foreach ($groupItems as $item) {
+                        $item->delete();
+                    }
+
+                    $deleteGroup->delete();
+                }
+            }
+        }
+
+
+        foreach ($request->selectable_group as $group) {
+            $id = $group['id'] ?? null;
+            $selectedGroup = $id ? SetMealGroup::find($id) : null;
 
             if ($selectedGroup) {
                 $selectedGroup->update([
@@ -1071,6 +1107,22 @@ class ItemManagementController extends Controller
                     'max_select' => $group['group_type'] === 'single-select' ? 1 : $group['max_select'],
                     'sort_order' => $group['sort_order'] ?? 0,
                 ]);
+
+                if ($group['set_meal_group_item']) {
+                    foreach ($group['set_meal_group_item'] as $opt) {
+                        $groupItem = SetMealGroupItem::find($opt['id']);
+
+                        if ($groupItem) {
+                            $groupItem->update([
+                                'set_meal_group_id' => $selectedGroup->id,
+                                'product_id' => $opt['id'],
+                                'original_price' => $opt['original_price'],
+                                'additional_charge' => $opt['additional_charge'],
+                                'quantity' => $opt['quantity'],
+                            ]);
+                        }
+                    }
+                }
             }
 
             if (!$selectedGroup) {
@@ -1083,14 +1135,10 @@ class ItemManagementController extends Controller
                     'max_select' => $group['group_type'] === 'single-select' ? 1 : $group['max_select'],
                     'sort_order' => $group['sort_order'] ?? 0,
                 ]);
-            }
 
-            if ($group['set_meal_group_item']) {
-                foreach ($group['set_meal_group_item'] as $opt) {
-                    $groupItem = SetMealGroupItem::find($opt['id']);
-
-                    if ($groupItem) {
-                        $groupItem->update([
+                if (!empty($group['group_option'])) {
+                    foreach ($group['group_option'] as $opt) {
+                        $groupItem = SetMealGroupItem::create([
                             'set_meal_group_id' => $selectedGroup->id,
                             'product_id' => $opt['id'],
                             'original_price' => $opt['prices'],
@@ -1098,19 +1146,6 @@ class ItemManagementController extends Controller
                             'quantity' => $opt['quantity'],
                         ]);
                     }
-                }
-            }
-
-            if ($group['group_option']) {
-                
-                foreach ($group['group_option'] as $opt) {
-                    $groupItem = SetMealGroupItem::create([
-                        'set_meal_group_id' => $selectedGroup->id,
-                        'product_id' => $opt['id'],
-                        'original_price' => $opt['prices'],
-                        'additional_charge' => $opt['additional_charge'],
-                        'quantity' => $opt['quantity'],
-                    ]);
                 }
             }
         }

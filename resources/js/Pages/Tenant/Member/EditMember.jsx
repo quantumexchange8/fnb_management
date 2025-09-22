@@ -53,11 +53,8 @@ export default function EditMember({ user, cashWallet, dineWallet, transaction }
     }
 
     const editProfile = (user) => {
-        console.log('clicked')
         setEditProfileOpen(true)
     }
-
-    console.log('editProfileOpen', editProfileOpen)
 
     const closeEditProfile = () => {
         setEditProfileOpen(false)
@@ -154,7 +151,6 @@ export default function EditMember({ user, cashWallet, dineWallet, transaction }
     }
 
     const handleSwitchChange = (value) => {
-        console.log('test')
         setChecked(value); // update UI immediately
         setIsLoading(true);
 

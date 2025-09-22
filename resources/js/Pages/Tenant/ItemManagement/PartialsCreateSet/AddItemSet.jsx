@@ -261,7 +261,8 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                 id: p.id,
                 name: p.name,
                 item_code: p.item_code,
-                quantity: p.quantity || 1
+                quantity: p.quantity || 1,
+                product_image: p.product_image,
             }))
         );
         
@@ -295,9 +296,16 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                                 <>
                                     {
                                         data.fixed_item.map((selectedFixedItem, index) => (
-                                            <div key={index} className="max-w-[120px] max-h-[120px] w-full h-[120px] bg-neutral-50 border border-neutral-100 rounded-lg flex items-center justify-center relative overflow-hidden">
-                                                
-                                                {selectedFixedItem.product?.item_code ? selectedFixedItem.product.item_code : selectedFixedItem.item_code}
+                                            <div key={index} className="max-w-[120px] max-h-[120px] w-full h-[120px] bg-neutral-50 border border-neutral-100 rounded-lg flex items-center justify-center relative overflow-hidden p-3">
+                                                {
+                                                    selectedFixedItem.product_image ? (
+                                                        <img src={selectedFixedItem.product_image} alt="" />
+                                                    ) : (
+                                                        <div className="text-sm text-neutral-900 line-clamp-2 text-center">
+                                                            {selectedFixedItem.name}
+                                                        </div>
+                                                    )
+                                                }
 
                                                 <div className="absolute top-2 right-2 cursor-pointer" onClick={() => removeFromFixedItem(selectedFixedItem.id)} >
                                                     <XIcon4 />
@@ -522,6 +530,7 @@ export default function AddItemSet({ data, setData, errors, getErrors, enableDel
                                     placeholder='1'
                                     className="w-full max-w-80"
                                     disabled={data.price_setting === 'sum_item'}
+                                    precision={2}
                                 />
                             </div>
                         </div>

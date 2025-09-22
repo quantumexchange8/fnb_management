@@ -276,7 +276,6 @@ export default function ModifierGroupList() {
                 const status = error.response.status;
 
                 if (status === 400) {
-                    console.log(error.response.data.message);
                     setErrorMessage(error.response.data.message);
                 } else {
                     setErrorMessage('Unexpected error occurred.');

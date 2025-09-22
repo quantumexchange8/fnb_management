@@ -9,6 +9,7 @@ import Button from "@/Components/Button";
 import { NextIcon, PreviousIcon } from "@/Components/Icon/Outline";
 import dayjs from 'dayjs';
 import EditSetItem from "./PartialsCreateSet/EditSetItem";
+import toast from "react-hot-toast";
 
 export default function EditSetMeal ({ setMeals }) {
 
@@ -70,8 +71,8 @@ export default function EditSetMeal ({ setMeals }) {
         available_time: 'all-time',
         specify_start_time: '',
         specify_end_time: '',
-        stock_alert: 'enable',
-        low_stock: '',
+        // stock_alert: 'enable',
+        // low_stock: '',
     });
 
     useEffect(() => {
@@ -109,8 +110,8 @@ export default function EditSetMeal ({ setMeals }) {
         post(route('items-management.update-set-meals'), {
             onSuccess: () => {
                 setIsLoading(false);
-                toast.success(`${t('set_meal_created_success')}`, {
-                    title: `${t('set_meal_created_success')}`,
+                toast.success(`${t('set_meal_updated_success')}`, {
+                    title: `${t('set_meal_updated_success')}`,
                     duration: 3000,
                     variant: 'variant3',
                 });
@@ -210,7 +211,7 @@ export default function EditSetMeal ({ setMeals }) {
                                         <PreviousIcon />
                                         <span>{t('previous')}</span>
                                     </Button>
-                                    <Button size="md" onClick={submit}>{t('create_now')}</Button>
+                                    <Button size="md" onClick={submit}>{t('save_change')}</Button>
                                 </div>
                             )
                         }

@@ -256,7 +256,7 @@ export default function ProductList() {
                                                                         <div className="text-neutral-800 text-base font-bold text-wrap h-[50px]">{product.item_code} - {product.name}</div>
                                                                         <div className="flex justify-between items-center">
                                                                             <div className="text-neutral-700 font-medium text-base">RM {product.prices}</div>
-                                                                            <div>
+                                                                            <div onClick={(e) => e.stopPropagation()}>
                                                                                 <Switch 
                                                                                     value={checked}
                                                                                     onChange={(checked) => handleSwitchChange(product.id, checked)}

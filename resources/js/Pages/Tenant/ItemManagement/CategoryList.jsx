@@ -34,6 +34,9 @@ export default function CategoryList() {
     const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
     const [isOrderCategoryOpen, setIsOrderCategoryOpen] = useState(false);
+    const [isNoProdOpen, setIsNoProdOpen] = useState(false);
+    const [noProdDetails, setNoProdDetails] = useState(null);
+    const [getLinkedProducts, setGetLinkProducts] = useState([]);
 
     const fetchCategories = async () => {
         setIsLoading(true);
@@ -178,6 +181,40 @@ export default function CategoryList() {
         }
     };
 
+    const openProd = (record) => {
+        setIsNoProdOpen(true);
+        setNoProdDetails(record);
+    }
+    const closeProd = (record) => {
+        setNoProdDetails(null);
+        setIsNoProdOpen(false);
+        setGetLinkProducts([])
+    }
+
+    const fetchLinkedCategoryProduct = async () => {
+        setIsLoading(true);
+
+        try {
+            
+            const response = await axios.get('/items-management/getLinkCategoryProduct', {
+                params: {
+                    category_id: noProdDetails.id,
+                }
+            });
+
+            setGetLinkProducts(response.data);
+
+        } catch (error) {
+            console.error('Error Fetching linked products: ', error);
+        }
+    }
+
+    useEffect(() => {
+        if (noProdDetails) {
+            fetchLinkedCategoryProduct();
+        }
+    }, [noProdDetails])
+
     const columns = [
         {
             title: 'Visibility',
@@ -233,7 +270,7 @@ export default function CategoryList() {
             width: 130,
             render: (_, record) => {
                 return (
-                    <div>
+                    <div onClick={(e) => {openProd(record), e.stopPropagation()}} >
                         {record.product.length}
                     </div>
                 )
@@ -312,15 +349,16 @@ export default function CategoryList() {
     }, [selectedDetails]);
 
     useEffect(() => {
-        const sorted = getCategory.map((cat, index) => ({
-            id: cat.id,
-            name: cat.name,
-            order_no: index + 1,
-        }));
+        if (getFullCategory.length) {
+            const sorted = getFullCategory.map((cat, index) => ({
+                id: cat.id,
+                name: cat.name,
+                order_no: cat.order_no ?? index + 1,
+            }));
 
-        setData("category_sorting", sorted);
-
-    }, [getCategory]);
+            setData("category_sorting", sorted);
+        }
+    }, [getFullCategory]);
 
     const handleColorChange = (color) => {
         setData('category_color', color.toHexString());
@@ -638,15 +676,75 @@ export default function CategoryList() {
   
             <ConfirmDialog show={isConfirmDeleteOpen}>
                 <div className="p-6 flex flex-col gap-8">
-                    <div className="flex flex-col gap-2">
-                        <div className="text-lg font-bold text-gray-950 text-center">Confirm Delete?</div>
-                    </div>
+                    {
+                        errors.Errors ? (
+                            <div className="flex flex-col gap-2">
+                                <div className="text-lg font-bold text-error-600 text-center">Unable to delete!</div>
+                                <div className="text-sm text-gray-700 text-center">
+                                    Please ensure there are no products associated with this category before deletion.
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                <div className="text-lg font-bold text-gray-950 text-center">Confirm Delete?</div>
+                            </div>
+                        )
+                    }
                     <div className="flex justify-center gap-4">
-                        <Button variant="white" size="sm" onClick={cancelDeleteCategory}>Cancel</Button>
-                        <Button size="sm" variant="red" onClick={confirmDelete}>Confirm</Button>
+                        {
+                            errors.Errors ? (
+                                <>
+                                    <Button variant="white" size="md" onClick={cancelDeleteCategory}>Return</Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button variant="white" size="sm" onClick={cancelDeleteCategory}>Cancel</Button>
+                                    <Button size="sm" variant="red" onClick={confirmDelete}>Confirm</Button>
+                                </>
+                            )
+                        }
                     </div>
                 </div>
             </ConfirmDialog>
+
+            <Modal
+                show={isNoProdOpen}
+                onClose={closeProd} 
+                title={t('linked_products')}
+                maxWidth='sm'
+                maxHeight='sm'
+                footer={
+                    <div className="flex items-center justify-end gap-4 w-full p-4">
+                        <Button variant="white" size="md" onClick={closeProd}>Close</Button>
+                    </div>
+                }
+            >
+                <div className="w-full flex flex-col px-4 py-3">   
+                    {
+                        getLinkedProducts && getLinkedProducts.length > 0 ? (
+                            <>
+                                {
+                                    getLinkedProducts.map((product) => (
+                                        <div key={product.id} className="flex items-center gap-3 border-b border-neutral-200 py-2">
+                                            <div className="w-20 h-20 bg-neutral-100 rounded-md overflow-hidden flex justify-center items-center p-2">
+                                                <img src={product.product_image} alt={product.item_code} className="object-cover" />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <div>{product.item_code} - {product.name}</div>
+                                                <div>RM {product.prices}</div>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </>
+                        ) : (
+                            <div className="w-full flex flex-col items-center justify-center py-5">
+                                {t('no_products_linked_to_this_category')}
+                            </div>
+                        )
+                    }
+                </div>
+            </Modal>
         </TenantAuthenicatedLayout>
     )
 }

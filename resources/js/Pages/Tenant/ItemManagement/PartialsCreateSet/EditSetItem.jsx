@@ -7,8 +7,8 @@ import TextInput from "@/Components/TextInput";
 import { Checkbox, Collapse, InputNumber, Radio, Spin, Tag } from "antd";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import SelectableGroup from "./SelectableGroup";
 import { motion, AnimatePresence } from 'framer-motion';
+import EditSelectableGroup from "./EditSelectableGroup";
 
 export default function EditSetItem({ data, setData, errors, getErrors }) {
 
@@ -25,6 +25,7 @@ export default function EditSetItem({ data, setData, errors, getErrors }) {
     const [selectedGroupItemOpen, setSelectedGroupItemOpen] = useState(false);
     const [isEditSelectableGrpOpen, setIsEditSelectableGrpOpen] = useState(false);
     const [editSelectableItem, setEditSelectableItem] = useState(null);
+    const [toRemoveGroupId, setToRemoveGroupId] = useState([]);
 
     const fetchMealItem = async () => {
         setIsLoading(true);
@@ -102,15 +103,25 @@ export default function EditSetItem({ data, setData, errors, getErrors }) {
 
     const removeGroupOption = (groupToRemove) => {
         const currentGroups = tempSelectableGroup ?? data.selectable_group ?? [];
-        const updatedGroups = currentGroups.filter(
-            group => group.uid !== groupToRemove.uid
-        );
+
+        const updatedGroups = currentGroups.filter(group => {
+            // Match by id if it exists, otherwise by uid
+            if (groupToRemove.id) {
+                setToRemoveGroupId([...toRemoveGroupId, groupToRemove.id]);
+                return group.id !== groupToRemove.id;
+            } else {
+                return group.uid !== groupToRemove.uid;
+            }
+        });
+
 
         setTempSelectableGroup(updatedGroups);
     };
     const updateNewDeletedGroup = () => {
+
         if (tempSelectableGroup && tempSelectableGroup.length > 0) {
             setData('selectable_group', tempSelectableGroup);
+            setData('delete_group', toRemoveGroupId);
         }
         
         setTempSelectableGroup(null);
@@ -332,15 +343,20 @@ export default function EditSetItem({ data, setData, errors, getErrors }) {
                                 <>
                                     {
                                         data.fixed_item.map((selectedFixedItem, index) => (
-                                            <div key={index} className="max-w-[120px] max-h-[120px] w-full h-[120px] bg-neutral-50 border border-neutral-100 rounded-lg flex items-center justify-center relative overflow-hidden">
+                                            <div key={index} className="max-w-[120px] max-h-[120px] w-full h-[120px] bg-neutral-50 border border-neutral-100 rounded-lg flex items-center justify-center relative overflow-hidden p-3">
                                                 {
-                                                    selectedFixedItem.product_image ? (
+                                                    selectedFixedItem.product ? (
+                                                        <div className="text-sm text-neutral-900 line-clamp-2 text-center">
+                                                            {selectedFixedItem.product.name}
+                                                        </div>
+                                                    ) : selectedFixedItem.product_image ? (
                                                         <img src={selectedFixedItem.product_image} alt={selectedFixedItem.item_code} className="max-w-[100px] max-h-[100px] w-full h-[100px] object-cover rounded-lg" />
                                                     ) : (
-                                                        <span className="font-bold">{selectedFixedItem.product?.item_code ? selectedFixedItem.product.item_code : selectedFixedItem.item_code}</span>
+                                                        <div className="text-sm text-neutral-900 line-clamp-2 text-center">
+                                                            {selectedFixedItem.name}
+                                                        </div>
                                                     )
                                                 }
-                                                
 
                                                 <div className="absolute top-2 right-2 cursor-pointer" onClick={() => removeFromFixedItem(selectedFixedItem.id)} >
                                                     <XIcon4 />
@@ -479,12 +495,29 @@ export default function EditSetItem({ data, setData, errors, getErrors }) {
                                                                                         <div key={index} className="p-1 w-[52px] h-[52px] flex items-center justify-center border border-neutral-100 bg-neutral-50 rounded-lg">
                                                                                             {/* <span className="text-xss">{opt.item_code ? opt.item_code : opt.product?.item_code}</span> */}
                                                                                             {
-                                                                                                opt.product_image ? (
-                                                                                                    <img src={opt.product_image} alt={opt.product_image} className="object-cover" />
+                                                                                                opt.item_code ? (
+                                                                                                    <>
+                                                                                                        {
+                                                                                                            opt.product_image ? (
+                                                                                                                <img src={opt.product_image} alt={opt.product_image} className="object-cover" />
+                                                                                                            ) : (
+                                                                                                                <span className="text-xss">{opt.item_code}</span>
+                                                                                                            )
+                                                                                                        }
+                                                                                                    </>
                                                                                                 ) : (
-                                                                                                    <span className="text-xss">{opt.item_code}</span>
+                                                                                                    <>
+                                                                                                        {
+                                                                                                            opt.product_image ? (
+                                                                                                                <img src={opt.product.product_image} alt={opt.product.product_image} className="object-cover" />
+                                                                                                            ) : (
+                                                                                                                <span className="text-xss">{opt.product.item_code}</span>
+                                                                                                            )
+                                                                                                        }
+                                                                                                    </>
                                                                                                 )
                                                                                             }
+                                                                                            
                                                                                         </div>
                                                                                     ))
                                                                                 }
@@ -571,6 +604,7 @@ export default function EditSetItem({ data, setData, errors, getErrors }) {
                                     placeholder='1'
                                     className="w-full max-w-80"
                                     disabled={data.price_setting === 'sum_item'}
+                                    precision={2}
                                 />
                             </div>
                         </div>
@@ -634,7 +668,7 @@ export default function EditSetItem({ data, setData, errors, getErrors }) {
                 </div>
             </Modal>
 
-            <SelectableGroup 
+            <EditSelectableGroup 
                 data={data} 
                 setData={setData} 
                 isSelectableGrpOpen={isSelectableGrpOpen} 

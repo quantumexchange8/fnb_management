@@ -14,7 +14,7 @@ export default function CreateCategory() {
     const [isLoading, setIsLoading] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        type: '',
+        // type: '',
         name: '',
         visibility: 'display',
         category_color: '#1677ff',
@@ -126,7 +126,7 @@ export default function CreateCategory() {
                                 <div className="text-neutral-300 text-xs">{t('general_details_about_category')}</div>
                             </div>
                             <div className="py-5 flex flex-col gap-5">
-                                <div className="px-5 flex items-center gap-5">
+                                {/* <div className="px-5 flex items-center gap-5">
                                     <div className="max-w-40 w-full flex items-center gap-1">
                                         <span className="text-neutral-900 text-sm font-medium">{t('category_type')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
@@ -144,7 +144,7 @@ export default function CreateCategory() {
                                             className="w-full max-w-[328px]"
                                         />
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className="px-5 flex items-center gap-5">
                                     <div className="max-w-40 w-full flex items-center gap-1">
                                         <span className="text-neutral-900 text-sm font-medium">{t('category_name')}</span>

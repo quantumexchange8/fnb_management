@@ -23,7 +23,7 @@ class Product extends Model implements HasMedia
 
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id', 'id');
+        return $this->belongsTo(Category::class, 'category_id', 'id')->where('status', 'active');
     }
     public function product_modifier_group(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

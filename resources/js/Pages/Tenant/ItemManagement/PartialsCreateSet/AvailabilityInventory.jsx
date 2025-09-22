@@ -159,7 +159,7 @@ export default function AvailabilityInventory({
                 </div>
 
                 {/* Inventory */}
-                <div className="bg-white border border-neutral-100 shadow-sec-voucher rounded-lg flex flex-col">
+                {/* <div className="bg-white border border-neutral-100 shadow-sec-voucher rounded-lg flex flex-col">
                     <div className="py-3 px-5 flex items-center justify-between border-b border-neutral-50">
                         <div className="text-neutral-900 text-lg font-bold">{t('inventory')}</div>
                     </div>
@@ -195,7 +195,7 @@ export default function AvailabilityInventory({
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </>
     )

@@ -27,6 +27,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { DragHandle } from "@/Components/DragHandle";
+import InputError from "@/Components/InputError";
 
 
 export default function CreateModifierGroup() {
@@ -93,7 +94,7 @@ export default function CreateModifierGroup() {
         group_type: 'required',
         min_value: '',
         max_value: '',
-        overide: 'not_allowed',
+        // overide: 'not_allowed',
         modifier_item: null,
         meal_items: null,
     });
@@ -559,7 +560,7 @@ export default function CreateModifierGroup() {
                                             </Tooltip>
                                         </div>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-1">
                                         <TextInput 
                                             type='text'
                                             value={data.group_name}
@@ -567,6 +568,7 @@ export default function CreateModifierGroup() {
                                             onChange={(e) => setData('group_name', e.target.value)}
                                             placeholder={t('eg_rice_portion')}
                                         />
+                                        <InputError message={errors.group_name} />
                                     </div>
                                 </div>
                                 <div className="px-5 flex items-center gap-5">
@@ -574,7 +576,7 @@ export default function CreateModifierGroup() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('display_name')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-1">
                                         <TextInput 
                                             type='text'
                                             value={data.display_name}
@@ -582,6 +584,7 @@ export default function CreateModifierGroup() {
                                             onChange={(e) => setData('display_name', e.target.value)}
                                             placeholder={t('eg_select_your_rice_portion')}
                                         />
+                                        <InputError message={errors.display_name} />
                                     </div>
                                 </div>
                                 <div className="px-5 py-2.5 flex items-center gap-5">
@@ -589,7 +592,7 @@ export default function CreateModifierGroup() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('group_type')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full">
+                                    <div className="w-full flex flex-col gap-1">
                                         <Radio.Group 
                                             value={data.group_type}
                                             onChange={(e) => setData('group_type', e.target.value)}
@@ -614,6 +617,7 @@ export default function CreateModifierGroup() {
                                                     value: 'optional' }
                                             ]}
                                         />
+                                        <InputError message={errors.display_name} />
                                     </div>
                                 </div>
                                 <div className="px-5 py-2.5 flex items-center gap-5">
@@ -621,7 +625,7 @@ export default function CreateModifierGroup() {
                                         <span className="text-neutral-900 text-sm font-medium">{t('min_n_max_selection')}</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
                                     </div>
-                                    <div className="w-full flex items-center gap-5">
+                                    <div className="w-full flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
                                             <div>
                                                 <InputNumber 
@@ -650,10 +654,10 @@ export default function CreateModifierGroup() {
                                                 />
                                             </div>
                                         </div>
-                                        <div></div>
+                                        <InputError message={errors.min_value || errors.max_value} />
                                     </div>
                                 </div>
-                                <div className="px-5 py-2.5 flex items-center gap-5">
+                                {/* <div className="px-5 py-2.5 flex items-center gap-5">
                                     <div className="max-w-40 w-full flex items-center gap-1">
                                         <span className="text-neutral-900 text-sm font-medium">{t('allow_overide')}?</span>
                                         <span className="text-error-500 text-xs font-medium">*</span>
@@ -668,7 +672,7 @@ export default function CreateModifierGroup() {
                                             ]}
                                         />
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="bg-white border border-neutral-100 shadow-sec-voucher rounded-lg flex flex-col">
@@ -702,11 +706,12 @@ export default function CreateModifierGroup() {
                                             />
                                         </>
                                     ) : (
-                                        <div>
+                                        <div className="flex items-center gap-3">
                                             <Button size="md" className="flex items-center gap-2" onClick={addModifierItem} >
                                                 <PlusIcon />
                                                 <span>{t('add')}</span>
                                             </Button>
+                                            <InputError message={errors.modifier_item} />
                                         </div>
                                     )
                                 }
@@ -742,11 +747,13 @@ export default function CreateModifierGroup() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div>
+                                        <div className="flex items-center gap-3">
                                             <Button size="md" className="flex items-center gap-2" onClick={addMealItem} >
                                                 <PlusIcon />
                                                 <span>{t('add')}</span>
                                             </Button>
+
+                                            <InputError message={errors.modifier_item} />
                                         </div>
                                     )
                                 }
